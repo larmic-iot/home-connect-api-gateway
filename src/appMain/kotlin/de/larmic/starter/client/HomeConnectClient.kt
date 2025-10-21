@@ -15,6 +15,8 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import platform.posix.wait
+import kotlin.io.println
 
 /**
  * Ktor HTTP client using Curl engine to be platform-agnostic (works in Docker/Linux and macOS).
@@ -39,7 +41,7 @@ class HomeConnectClient(
     /**
      * Performs the Device Authorization request (OAuth 2.0 Device Code Flow, Step 1).
      * Returns the payload as DeviceAuthorizationResponse.
-     * Also logs useful information and attempts to open a browser with the verification URL.
+     * Logs useful information for the user to complete the flow manually.
      */
     suspend fun startDeviceAuthorization(
         clientId: String,
@@ -63,44 +65,19 @@ class HomeConnectClient(
             // Log formatted output similar to example-requests.http
             println("═══════════════════════════════════════════")
             println("Open this URL:")
-            println(payload.verificationUri)
-            println("")
-            println("Enter this code:")
-            println(payload.userCode)
+            println("(This initial step is only needed to authorize this app with Home Connect. Once authorized, a refresh token will be used automatically.)")
+            println("${payload.verificationUri}?user_code=${payload.userCode}")
             println("═══════════════════════════════════════════")
             if (payload.expiresIn != null) println("You have ${payload.expiresIn} seconds")
             val wait = payload.interval ?: 5
             println("")
             println("After entering the code, execute Step 2 (wait ${wait} seconds)")
 
-            val targetUrl = payload.verificationUriComplete ?: payload.verificationUri
-            val opened = openInBrowser(targetUrl)
-            println("Open browser attempt: ${if (opened) "OK" else "FAILED"} -> $targetUrl")
-
+            // In containerized/headless environments we do not auto-open a browser. Logging is sufficient.
             return payload
         } finally {
             client.close()
         }
     }
 
-    // Attempt to open URL using common commands available on macOS, Linux, and Windows.
-    private fun openInBrowser(url: String): Boolean {
-        val commands = listOf(
-            listOf("open", url),                 // macOS
-            listOf("xdg-open", url),             // Linux
-            listOf("cmd", "/c", "start", url), // Windows
-            listOf("rundll32", "url.dll,FileProtocolHandler", url)
-        )
-        for (cmd in commands) {
-            val ok = tryRun(cmd)
-            if (ok) return true
-        }
-        return false
-    }
-
-    private fun tryRun(cmd: List<String>): Boolean = try {
-        val command = cmd.joinToString(" ") { it }
-        val code = platform.posix.system(command)
-        code == 0
-    } catch (_: Throwable) { false }
 }
