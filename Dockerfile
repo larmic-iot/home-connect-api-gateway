@@ -53,9 +53,9 @@ FROM alpine:3.22 AS runtime
 RUN apk add --no-cache gcompat libgcc libstdc++
 
 # OCI labels for metadata
-LABEL org.opencontainers.image.title="ktor_with_kotlin_native-starter" \
-      org.opencontainers.image.description="Ktor with Kotlin/Native server with Docker and GitHub Actions" \
-      org.opencontainers.image.source="https://github.com/larmic/ktor_with_kotlin_native-starter" \
+LABEL org.opencontainers.image.title="home-connect-api-gateway" \
+      org.opencontainers.image.description="Home Connect API Gateway - Docker container providing a REST API adapter for BSH Home Connect devices (Bosch, Siemens, Neff, Gaggenau)" \
+      org.opencontainers.image.source="https://github.com/larmic-iot/home-connect-api-gateway" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 # Copy binary

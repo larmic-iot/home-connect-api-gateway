@@ -8,4 +8,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "ktor_with_kotlin_native-starter"
+rootProject.name = "home-connect-api-gateway"

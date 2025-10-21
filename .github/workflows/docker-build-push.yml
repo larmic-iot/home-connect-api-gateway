@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  IMAGE_NAME: larmic/ktor_with_kotlin_native-starter
+  IMAGE_NAME: larmic/home-connect-api-gateway
 
 # Cancel previous runs of the same workflow/ref if a new run is triggered
 concurrency:

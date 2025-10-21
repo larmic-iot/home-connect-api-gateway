@@ -1,8 +1,8 @@
 .DEFAULT_GOAL := help
 
 # Container/image naming
-CONTAINER_NAME ?= larmic-kotlin-native-starter-example
-IMAGE_NAME ?= larmic/kotlin-native-starter-example
+CONTAINER_NAME ?= home-connect-api-gateway
+IMAGE_NAME ?= larmic/home-connect-api-gateway
 IMAGE_TAG ?= latest
 
 .PHONY: help build-binary docker-build-arm docker-build-amd gradle-run docker-run docker-stop
