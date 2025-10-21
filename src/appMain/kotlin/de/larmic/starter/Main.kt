@@ -12,7 +12,9 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.*
 
 fun main() {
-    println("Starting Server...")
+    // Trigger AppConfig initialization (will exit if HOME_CONNECT_CLIENT_ID is missing)
+    val clientId = AppConfig.clientId
+    println("Starting Server with HOME_CONNECT_CLIENT_ID=$clientId ...")
 
     embeddedServer(CIO, port = 8080) {
         install(ContentNegotiation) {
