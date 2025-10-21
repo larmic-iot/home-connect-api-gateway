@@ -7,17 +7,6 @@ import platform.posix.time
  * In-memory holder for OAuth tokens. Ephemeral; will be lost on application restart.
  */
 object AuthState {
-    data class TokenSnapshot(
-        val accessToken: String?,
-        val refreshToken: String?,
-        val expiresInSeconds: Int?,
-        val issuedAtMillis: Long?,
-    ) {
-        val expiresAtMillis: Long? = if (issuedAtMillis != null && expiresInSeconds != null) {
-            issuedAtMillis + expiresInSeconds.toLong() * 1000L
-        } else null
-    }
-
     private var _accessToken: String? = null
     private var _refreshToken: String? = null
     private var _expiresInSeconds: Int? = null
