@@ -1,0 +1,82 @@
+### Configuration
+# Note: Variables like {{clientId}} are loaded from http-client.private.env.json (not committed).
+
+###
+
+### Step 1: Request device code
+POST https://api.home-connect.com/security/oauth/device_authorization
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}
+    &scope=IdentifyAppliance Monitor Settings Control
+
+> {%
+    client.global.set("deviceCode", response.body.device_code);
+    client.global.set("userCode", response.body.user_code);
+    client.global.set("verificationUri", response.body.verification_uri);
+    client.global.set("interval", response.body.interval || 5);
+
+    client.log("═══════════════════════════════════════════");
+    client.log("Open this URL:");
+    client.log(response.body.verification_uri);
+    client.log("");
+    client.log("Enter this code:");
+    client.log(response.body.user_code);
+    client.log("═══════════════════════════════════════════");
+    client.log("You have " + response.body.expires_in + " seconds");
+    client.log("");
+    client.log("After entering the code,");
+    client.log("execute Step 2 (wait " + (response.body.interval || 5) + " seconds)");
+%}
+
+###
+
+### Step 2: Exchange device code for tokens (retry until authorized)
+POST https://api.home-connect.com/security/oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:device_code
+    &client_id={{clientId}}
+    &device_code={{deviceCode}}
+
+> {%
+    if (response.body.error === "authorization_pending") {
+        client.log("Waiting for authorization... Run this request again!");
+    } else if (response.body.error) {
+        client.log("Error: " + response.body.error);
+    } else {
+        client.global.set("accessToken", response.body.access_token);
+        client.global.set("refreshToken", response.body.refresh_token);
+
+        client.log("═══════════════════════════════════════════");
+        client.log("✓ Success!");
+        client.log("═══════════════════════════════════════════");
+        client.log("Access Token: " + response.body.access_token);
+        client.log("Refresh Token: " + response.body.refresh_token);
+        client.log("═══════════════════════════════════════════");
+    }
+%}
+
+### Step 3: List home appliances
+GET https://api.home-connect.com/api/homeappliances
+Authorization: Bearer {{accessToken}}
+Accept: application/vnd.bsh.sdk.v1+json
+
+<> 2025-10-21T093913.200.json
+
+###
+
+### Refresh token (optional)
+@savedRefreshToken = INSERT_REFRESH_TOKEN_HERE
+
+POST https://api.home-connect.com/security/oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token
+    &client_id={{clientId}}
+    &refresh_token={{savedRefreshToken}}
+
+> {%
+    client.global.set("accessToken", response.body.access_token);
+    client.log("✓ Token refreshed!");
+%}
