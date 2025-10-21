@@ -16,8 +16,6 @@ fun Route.deviceAuthorizationRoute() {
         try {
             val client = HomeConnectClient()
             val payload: DeviceAuthorizationResponse = client.startDeviceAuthorization(clientId, scope)
-            // Remember device_code for Step 2
-            DeviceAuthState.updateDeviceCode(payload.deviceCode)
             call.respond(payload)
         } catch (t: Throwable) {
             println("Device authorization failed: ${t.message}")

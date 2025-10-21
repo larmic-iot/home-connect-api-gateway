@@ -1,5 +1,7 @@
 package de.larmic.starter.client
 
+import de.larmic.starter.AuthState
+import de.larmic.starter.DeviceAuthState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.curl.Curl
@@ -83,9 +85,9 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
             if (payload.expiresIn != null) println("You have ${payload.expiresIn} seconds")
             val wait = payload.interval ?: 5
             println("")
-            println("After entering the code, execute Step 2 (wait ${wait} seconds)")
+            println("After entering the code, execute Step 2 (wait $wait seconds)")
 
-            // In containerized/headless environments we do not auto-open a browser. Logging is sufficient.
+            DeviceAuthState.updateDeviceCode(payload.deviceCode)
             return payload
         } finally {
             client.close()
@@ -130,6 +132,18 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
                     println("Access Token: ${payload.accessToken}")
                     println("Refresh Token: ${payload.refreshToken}")
                     println("═══════════════════════════════════════════")
+
+                    // Persist tokens in global AuthState with expiry and timestamp
+                    val access = payload.accessToken
+                    if (access != null) {
+                        AuthState.updateTokens(
+                            accessToken = access,
+                            refreshToken = payload.refreshToken,
+                            expiresInSeconds = payload.expiresInToken
+                        )
+                    } else {
+                        println("Warning: Successful token response without access_token. Nothing stored.")
+                    }
                 }
             }
 
