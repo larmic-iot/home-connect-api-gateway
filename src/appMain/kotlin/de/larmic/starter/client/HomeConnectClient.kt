@@ -152,4 +152,53 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
             client.close()
         }
     }
+
+    /**
+     * Refresh access token using the refresh_token grant.
+     * On success, updates AuthState with new access token and optionally new refresh token.
+     * If the response omits refresh_token, the previous one is retained in AuthState.
+     */
+    suspend fun refreshToken(
+        clientId: String,
+        refreshToken: String
+    ): OAuthTokenResponse {
+        val bodyParams = Parameters.build {
+            append("grant_type", "refresh_token")
+            append("client_id", clientId)
+            append("refresh_token", refreshToken)
+        }.formUrlEncode()
+
+        val client = httpClient()
+        try {
+            val response = client.post("$baseUrl/security/oauth/token") {
+                contentType(ContentType.Application.FormUrlEncoded)
+                headers { append("Accept", "application/json") }
+                setBody(bodyParams)
+            }
+
+            val payload: OAuthTokenResponse = response.body()
+
+            if (payload.error != null) {
+                println("Refresh error: ${payload.error}${payload.errorDescription?.let { ": $it" } ?: ""}")
+                return payload
+            }
+
+            val newAccess = payload.accessToken
+            val newRefresh = payload.refreshToken ?: refreshToken
+            if (newAccess != null) {
+                AuthState.updateTokens(
+                    accessToken = newAccess,
+                    refreshToken = newRefresh,
+                    expiresInSeconds = payload.expiresInToken
+                )
+                println("✓ Token refreshed and stored in memory.")
+            } else {
+                println("Warning: Refresh response without access_token. AuthState not updated.")
+            }
+
+            return payload
+        } finally {
+            client.close()
+        }
+    }
 }

@@ -12,6 +12,14 @@ object AuthState {
     private var _expiresInSeconds: Int? = null
     private var _issuedAtMillis: Long? = null
 
+    data class Snapshot(
+        val accessToken: String?,
+        val refreshToken: String?,
+        val expiresInSeconds: Int?,
+        val issuedAtMillis: Long?,
+        val expiresAtMillis: Long?
+    )
+
     @OptIn(ExperimentalForeignApi::class)
     fun updateTokens(accessToken: String, refreshToken: String?, expiresInSeconds: Int?) {
         val nowSeconds = time(null).toLong() // epoch seconds
@@ -21,5 +29,19 @@ object AuthState {
         _expiresInSeconds = expiresInSeconds
         _issuedAtMillis = nowMillis
         println("Stored OAuth tokens in memory (issuedAt=${nowMillis}).")
+    }
+
+    fun snapshot(): Snapshot? {
+        val issued = _issuedAtMillis
+        val expSec = _expiresInSeconds
+        val expiresAt = if (issued != null && expSec != null) issued + expSec * 1000L else null
+        if (_accessToken == null && _refreshToken == null) return null
+        return Snapshot(
+            accessToken = _accessToken,
+            refreshToken = _refreshToken,
+            expiresInSeconds = _expiresInSeconds,
+            issuedAtMillis = issued,
+            expiresAtMillis = expiresAt
+        )
     }
 }
