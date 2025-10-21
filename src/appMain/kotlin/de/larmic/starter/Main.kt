@@ -3,6 +3,7 @@ package de.larmic.starter
 import de.larmic.starter.routes.deviceAuthorizationRoute
 import de.larmic.starter.routes.healthRoutes
 import de.larmic.starter.routes.helloWorld
+import de.larmic.starter.routes.oauthTokenRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.*
@@ -22,6 +23,7 @@ fun main() {
             helloWorld()
             healthRoutes()
             deviceAuthorizationRoute()
+            oauthTokenRoute()
         }
     }.start(wait = true)
 }

@@ -26,16 +26,28 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
 }
 
 @Serializable
-data class DeviceAuthorizationResponse(
-    @SerialName("device_code") val deviceCode: String,
-    @SerialName("user_code") val userCode: String,
-    @SerialName("verification_uri") val verificationUri: String,
-    @SerialName("verification_uri_complete") val verificationUriComplete: String? = null,
-    @SerialName("expires_in") val expiresIn: Int? = null,
-    val interval: Int? = null
-)
+ data class DeviceAuthorizationResponse(
+     @SerialName("device_code") val deviceCode: String,
+     @SerialName("user_code") val userCode: String,
+     @SerialName("verification_uri") val verificationUri: String,
+     @SerialName("verification_uri_complete") val verificationUriComplete: String? = null,
+     @SerialName("expires_in") val expiresIn: Int? = null,
+     val interval: Int? = null
+ )
 
-class HomeConnectClient(
+ @Serializable
+ data class OAuthTokenResponse(
+     @SerialName("access_token") val accessToken: String? = null,
+     @SerialName("refresh_token") val refreshToken: String? = null,
+     @SerialName("token_type") val tokenType: String? = null,
+     @SerialName("expires_in") val expiresInToken: Int? = null,
+     val scope: String? = null,
+     val error: String? = null,
+     @SerialName("error_description") val errorDescription: String? = null,
+     @SerialName("error_uri") val errorUri: String? = null
+ )
+ 
+ class HomeConnectClient(
     private val baseUrl: String = "https://api.home-connect.com"
 ) {
     /**
@@ -80,4 +92,50 @@ class HomeConnectClient(
         }
     }
 
+    /**
+     * Step 2: Exchange device_code for tokens.
+     * Returns OAuthTokenResponse which contains either access/refresh tokens or error information (e.g., authorization_pending).
+     */
+    suspend fun getOAuthToken(
+        clientId: String,
+        deviceCode: String
+    ): OAuthTokenResponse {
+        val bodyParams = Parameters.build {
+            append("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
+            append("client_id", clientId)
+            append("device_code", deviceCode)
+        }.formUrlEncode()
+
+        val client = httpClient()
+        try {
+            val response = client.post("$baseUrl/security/oauth/token") {
+                contentType(ContentType.Application.FormUrlEncoded)
+                headers { append("Accept", "application/json") }
+                setBody(bodyParams)
+            }
+
+            val payload: OAuthTokenResponse = response.body()
+
+            when {
+                payload.error == "authorization_pending" -> {
+                    println("Waiting for authorization... Run this request again!")
+                }
+                payload.error != null -> {
+                    println("Error: ${payload.error}${payload.errorDescription?.let { ": $it" } ?: ""}")
+                }
+                else -> {
+                    println("═══════════════════════════════════════════")
+                    println("✓ Success!")
+                    println("═══════════════════════════════════════════")
+                    println("Access Token: ${payload.accessToken}")
+                    println("Refresh Token: ${payload.refreshToken}")
+                    println("═══════════════════════════════════════════")
+                }
+            }
+
+            return payload
+        } finally {
+            client.close()
+        }
+    }
 }
