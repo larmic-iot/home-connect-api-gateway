@@ -53,6 +53,13 @@ kotlin {
                 implementation("io.ktor:ktor-server-cio:3.3.1")
                 implementation("io.ktor:ktor-server-content-negotiation:3.3.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
+
+                // Ktor HTTP client (Native)
+                implementation("io.ktor:ktor-client-core:3.3.1")
+                implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
+                // Engine for Native targets (Curl is cross-platform and works in Docker/Linux and macOS)
+                implementation("io.ktor:ktor-client-curl:3.3.1")
             }
         }
 
