@@ -41,5 +41,8 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
+      - name: Run tests
+        run: ./gradlew --no-daemon check
+
       - name: Compile/link native release executable
         run: ./gradlew --no-daemon linkReleaseExecutableApp
