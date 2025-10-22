@@ -5,13 +5,11 @@ package de.larmic.starter
  * Note: this is ephemeral and resets on application restart.
  */
 object DeviceAuthState {
-    private var _deviceCode: String? = null
-
-    val deviceCode: String?
-        get() = _deviceCode
+    var deviceCode: String? = null
+        private set
 
     fun updateDeviceCode(deviceCode: String) {
-        _deviceCode = deviceCode
+        DeviceAuthState.deviceCode = deviceCode
         println("Stored device_code in memory for later token exchange.")
     }
 }

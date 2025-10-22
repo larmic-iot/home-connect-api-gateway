@@ -5,7 +5,6 @@ import de.larmic.starter.DeviceAuthState
 import de.larmic.starter.client.HomeConnectClient
 import de.larmic.starter.client.OAuthTokenResponse
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -15,8 +14,7 @@ fun Route.oauthTokenRoute() {
         val clientId = AppConfig.clientId
 
         // Prefer stored device_code from the last authorization start
-        val storedDeviceCode = DeviceAuthState.deviceCode
-        val deviceCode = storedDeviceCode
+        val deviceCode = DeviceAuthState.deviceCode
 
         if (deviceCode.isNullOrBlank()) {
             call.respond(

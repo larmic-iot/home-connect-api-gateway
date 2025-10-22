@@ -5,7 +5,6 @@ import de.larmic.starter.AuthState
 import de.larmic.starter.client.OAuthTokenResponse
 import de.larmic.starter.client.HomeConnectClient
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -13,8 +12,7 @@ import io.ktor.server.routing.get
 fun Route.tokenRefreshRoute() {
     get("/auth/token/refresh") {
         val clientId = AppConfig.clientId
-        val snapshot = AuthState.snapshot()
-        val refreshToken = snapshot?.refreshToken
+        val refreshToken = AuthState.refreshToken
 
         if (refreshToken.isNullOrBlank()) {
             call.respond(
