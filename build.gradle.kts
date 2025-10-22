@@ -66,6 +66,7 @@ kotlin {
         val appTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.ktor:ktor-server-test-host:3.3.1")
             }
         }
     }
