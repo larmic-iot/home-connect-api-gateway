@@ -1,8 +1,10 @@
+
 package de.larmic.starter.routes
 
 import de.larmic.starter.AuthState
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
@@ -11,7 +13,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class HealthRoutesTest {
 
@@ -30,9 +31,18 @@ class HealthRoutesTest {
         install(ContentNegotiation) { json() }
         routing { healthRoutes() }
 
+        // Configure client to handle JSON
+        val client = createClient {
+            install(ClientContentNegotiation) {
+                json()
+            }
+        }
+
         val response = client.get("/health")
         assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue(Regex("""\"status\"\s*:\s*\"UP\"""").containsMatchIn(response.bodyAsText()))
+
+        val healthResponse = response.body<HealthResponse>()
+        assertEquals("UP", healthResponse.status)
     }
 
     @Test
@@ -40,9 +50,17 @@ class HealthRoutesTest {
         install(ContentNegotiation) { json() }
         routing { healthRoutes() }
 
+        val client = createClient {
+            install(ClientContentNegotiation) {
+                json()
+            }
+        }
+
         val response = client.get("/health/live")
         assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue(Regex("""\"status\"\s*:\s*\"UP\"""").containsMatchIn(response.bodyAsText()))
+
+        val healthResponse = response.body<HealthResponse>()
+        assertEquals("UP", healthResponse.status)
     }
 
     @Test
@@ -50,11 +68,18 @@ class HealthRoutesTest {
         install(ContentNegotiation) { json() }
         routing { healthRoutes() }
 
+        val client = createClient {
+            install(ClientContentNegotiation) {
+                json()
+            }
+        }
+
         val response = client.get("/health/ready")
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
-        val body = response.bodyAsText()
-        assertTrue(Regex("""\"status\"\s*:\s*\"NOT_READY\"""").containsMatchIn(body))
-        assertTrue(Regex("""\"authorization\"\s*:\s*\"STARTING_DEVICE_AUTHORIZATION\"""").containsMatchIn(body))
+
+        val readiness = response.body<ReadinessResponse>()
+        assertEquals("NOT_READY", readiness.status)
+        assertEquals("STARTING_DEVICE_AUTHORIZATION", readiness.checks.authorization)
     }
 
     @Test
@@ -62,13 +87,20 @@ class HealthRoutesTest {
         install(ContentNegotiation) { json() }
         routing { healthRoutes() }
 
+        val client = createClient {
+            install(ClientContentNegotiation) {
+                json()
+            }
+        }
+
         AuthState.updateDeviceCode("device-code-123")
 
         val response = client.get("/health/ready")
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
-        val body = response.bodyAsText()
-        assertTrue(Regex("""\"status\"\s*:\s*\"NOT_READY\"""").containsMatchIn(body))
-        assertTrue(Regex("""\"authorization\"\s*:\s*\"WAITING_FOR_MANUAL_TASKS\"""").containsMatchIn(body))
+
+        val readiness = response.body<ReadinessResponse>()
+        assertEquals("NOT_READY", readiness.status)
+        assertEquals("WAITING_FOR_MANUAL_TASKS", readiness.checks.authorization)
     }
 
     @Test
@@ -76,15 +108,22 @@ class HealthRoutesTest {
         install(ContentNegotiation) { json() }
         routing { healthRoutes() }
 
+        val client = createClient {
+            install(ClientContentNegotiation) {
+                json()
+            }
+        }
+
         AuthState.updateDeviceCode("device-code-123")
         // expires immediately
         AuthState.updateTokens(accessToken = "acc", refreshToken = "ref", expiresInSeconds = 0)
 
         val response = client.get("/health/ready")
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
-        val body = response.bodyAsText()
-        assertTrue(Regex("""\"status\"\s*:\s*\"NOT_READY\"""").containsMatchIn(body))
-        assertTrue(Regex("""\"authorization\"\s*:\s*\"TOKEN_EXPIRED\"""").containsMatchIn(body))
+
+        val readiness = response.body<ReadinessResponse>()
+        assertEquals("NOT_READY", readiness.status)
+        assertEquals("TOKEN_EXPIRED", readiness.checks.authorization)
     }
 
     @Test
@@ -92,13 +131,20 @@ class HealthRoutesTest {
         install(ContentNegotiation) { json() }
         routing { healthRoutes() }
 
+        val client = createClient {
+            install(ClientContentNegotiation) {
+                json()
+            }
+        }
+
         AuthState.updateDeviceCode("device-code-123")
         AuthState.updateTokens(accessToken = "acc", refreshToken = "ref", expiresInSeconds = 3600)
 
         val response = client.get("/health/ready")
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = response.bodyAsText()
-        assertTrue(Regex("""\"status\"\s*:\s*\"READY\"""").containsMatchIn(body))
-        assertTrue(Regex("""\"authorization\"\s*:\s*\"UP\"""").containsMatchIn(body))
+
+        val readiness = response.body<ReadinessResponse>()
+        assertEquals("READY", readiness.status)
+        assertEquals("UP", readiness.checks.authorization)
     }
 }
