@@ -1,5 +1,6 @@
 package de.larmic.starter.routes
 
+import de.larmic.starter.AuthState
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -10,24 +11,20 @@ fun Route.healthRoutes() {
     }
 
     get("/health/ready") {
-        call.respond(HttpStatusCode.OK, mapOf("status" to "READY"))
+        val authStatus = AuthState.status()
+        val isReady = authStatus == AuthState.Status.UP
+        val httpStatus = if (isReady) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
+        val overall = if (isReady) "READY" else "NOT_READY"
 
-        // Example for a database check
-        // if (isDatabaseConnected) {
-        //     call.respond(HttpStatusCode.OK, mapOf(
-        //         "status" to "READY",
-        //         "checks" to mapOf(
-        //             "database" to "UP"
-        //         )
-        //     ))
-        // } else {
-        //     call.respond(HttpStatusCode.ServiceUnavailable, mapOf(
-        //         "status" to "NOT_READY",
-        //         "checks" to mapOf(
-        //             "database" to "DOWN"
-        //         )
-        //     ))
-        // }
+        call.respond(
+            httpStatus,
+            mapOf(
+                "status" to overall,
+                "checks" to mapOf(
+                    "authorization" to authStatus.name
+                )
+            )
+        )
     }
 
     get("/health/live") {
