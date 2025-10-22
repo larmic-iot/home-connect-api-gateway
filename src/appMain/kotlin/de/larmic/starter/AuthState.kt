@@ -15,6 +15,8 @@ object AuthState {
         private set
     var issuedAdMillis: Long? = null
         private set
+    var deviceCode: String? = null
+        private set
 
     @OptIn(ExperimentalForeignApi::class)
     fun updateTokens(accessToken: String, refreshToken: String?, expiresInSeconds: Int?) {
@@ -23,5 +25,10 @@ object AuthState {
         AuthState.expiresInSeconds = expiresInSeconds
         issuedAdMillis = time(null) * 1000L
         println("Stored OAuth tokens in memory (issuedAt=${time(null) * 1000L}).")
+    }
+
+    fun updateDeviceCode(deviceCode: String) {
+        AuthState.deviceCode = deviceCode
+        println("Stored device_code in memory for later token exchange.")
     }
 }

@@ -1,7 +1,6 @@
 package de.larmic.starter.client
 
 import de.larmic.starter.AuthState
-import de.larmic.starter.DeviceAuthState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.curl.Curl
@@ -87,7 +86,7 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
             println("")
             println("After entering the code, execute Step 2 (wait $wait seconds)")
 
-            DeviceAuthState.updateDeviceCode(payload.deviceCode)
+            AuthState.updateDeviceCode(payload.deviceCode)
             return payload
         } finally {
             client.close()

@@ -1,7 +1,6 @@
 package de.larmic.starter.routes
 
 import de.larmic.starter.AppConfig
-import de.larmic.starter.DeviceAuthState
 import de.larmic.starter.client.DeviceAuthorizationResponse
 import de.larmic.starter.client.HomeConnectClient
 import io.ktor.server.response.respond
