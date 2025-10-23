@@ -5,10 +5,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.curl.Curl
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
+import io.ktor.client.request.*
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.http.formUrlEncode
@@ -16,7 +16,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import platform.posix.wait
 import kotlin.io.println
 
 /**
@@ -46,6 +45,13 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
      val error: String? = null,
      @SerialName("error_description") val errorDescription: String? = null,
      @SerialName("error_uri") val errorUri: String? = null
+ )
+ 
+ @Serializable
+ data class ProxiedResponse(
+     val status: Int,
+     val contentType: String?,
+     val body: ByteArray
  )
  
  class HomeConnectClient(
@@ -196,6 +202,42 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
             }
 
             return payload
+        } finally {
+            client.close()
+        }
+    }
+
+    /**
+     * Generic proxied request to Home Connect API under /api/{pathAndQuery}.
+     */
+    suspend fun proxy(
+        method: HttpMethod,
+        pathAndQuery: String,
+        accessToken: String,
+        bodyText: String? = null,
+        contentType: ContentType? = null
+    ): ProxiedResponse {
+        val url = "$baseUrl/api/" + pathAndQuery.trimStart('/')
+        val client = httpClient()
+        try {
+            val response = client.request(url) {
+                this.method = method
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    append(HttpHeaders.Accept, "application/vnd.bsh.sdk.v1+json")
+                }
+                if (bodyText != null) {
+                    if (contentType != null) this.contentType(contentType)
+                    setBody(bodyText)
+                }
+            }
+            val bytes: ByteArray = response.body()
+            val ct = response.headers[HttpHeaders.ContentType]
+            return ProxiedResponse(
+                status = response.status.value,
+                contentType = ct,
+                body = bytes
+            )
         } finally {
             client.close()
         }
