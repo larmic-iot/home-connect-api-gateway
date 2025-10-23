@@ -8,7 +8,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
 fun Route.deviceAuthorizationRoute() {
-    get("/auth/init") {
+    get("/oauth/init") {
         val clientId = AppConfig.clientId
         val scope = "IdentifyAppliance Monitor Settings Control"
 

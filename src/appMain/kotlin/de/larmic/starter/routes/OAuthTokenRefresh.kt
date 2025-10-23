@@ -10,7 +10,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
 fun Route.tokenRefreshRoute() {
-    get("/auth/token/refresh") {
+    get("/oauth/token/refresh") {
         val clientId = AppConfig.clientId
         val refreshToken = AuthState.refreshToken
 
@@ -20,7 +20,7 @@ fun Route.tokenRefreshRoute() {
                 mapOf(
                     "status" to "ERROR",
                     "message" to "No refresh_token available. Obtain tokens first via device authorization.",
-                    "hint" to "Run /auth/init then /auth/token until success"
+                    "hint" to "Run /oauth/init then /oauth/token until success"
                 )
             )
             return@get
