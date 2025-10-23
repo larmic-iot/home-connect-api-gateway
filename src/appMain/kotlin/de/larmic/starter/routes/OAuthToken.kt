@@ -10,7 +10,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
 fun Route.oauthTokenRoute() {
-    get("/auth/device/token") {
+    get("/auth/token") {
         val clientId = AppConfig.clientId
 
         // Prefer stored device_code from the last authorization start
@@ -22,7 +22,7 @@ fun Route.oauthTokenRoute() {
                 mapOf(
                     "status" to "ERROR",
                     "message" to "No device_code available. Start device authorization first.",
-                    "hint" to "Call /auth/device/start and follow the instructions"
+                    "hint" to "Call /auth/init and follow the instructions"
                 )
             )
             return@get

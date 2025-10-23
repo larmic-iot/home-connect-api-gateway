@@ -20,7 +20,7 @@ fun Route.tokenRefreshRoute() {
                 mapOf(
                     "status" to "ERROR",
                     "message" to "No refresh_token available. Obtain tokens first via device authorization.",
-                    "hint" to "Run /auth/device/start then /auth/device/token until success"
+                    "hint" to "Run /auth/init then /auth/token until success"
                 )
             )
             return@get
