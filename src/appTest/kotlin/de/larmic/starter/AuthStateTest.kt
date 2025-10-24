@@ -27,16 +27,18 @@ class AuthStateTest {
 
     @Test
     fun `status is WAITING_FOR_MANUAL_TASKS when deviceCode set but tokens missing`() {
-        AuthState.updateDeviceCode("device-code-123")
+        val url = "https://verify.example?user_code=ABC"
+        AuthState.updateDeviceCode("device-code-123", url)
 
         val status = AuthState.status()
         assertTrue(status is AuthState.Status.WaitingForManualTasks)
         assertEquals("device-code-123", status.deviceCode)
+        assertEquals(url, AuthState.verificationUrl)
     }
 
     @Test
     fun `status is UP when tokens present and not expired`() {
-        AuthState.updateDeviceCode("device-code-123")
+        AuthState.updateDeviceCode("device-code-123", "https://verify.example?user_code=ABC")
         AuthState.updateTokens(accessToken = "acc", refreshToken = "ref", expiresInSeconds = 3600)
 
         val status = AuthState.status()
@@ -47,7 +49,7 @@ class AuthStateTest {
 
     @Test
     fun `status is TOKEN_EXPIRED when current time exceeds issuedAt plus expiresIn`() {
-        AuthState.updateDeviceCode("device-code-123")
+        AuthState.updateDeviceCode("device-code-123", "https://verify.example?user_code=ABC")
         AuthState.updateTokens(accessToken = "acc", refreshToken = "ref", expiresInSeconds = 0)
 
         val status = AuthState.status()

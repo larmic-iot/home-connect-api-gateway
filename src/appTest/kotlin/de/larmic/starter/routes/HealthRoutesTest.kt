@@ -60,7 +60,7 @@ class HealthRoutesTest {
     fun get_health_ready_not_ready_waiting_for_manual_tasks_when_deviceCode_but_tokens_missing() = testApplication {
         val client = setupTest { healthRoutes() }
 
-        AuthState.updateDeviceCode("device-code-123")
+        AuthState.updateDeviceCode("device-code-123", "https://verify.example?user_code=ABC")
 
         val response = client.get("/health/ready")
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
@@ -74,7 +74,7 @@ class HealthRoutesTest {
     fun get_health_ready_not_ready_token_expired_when_tokens_expired() = testApplication {
         val client = setupTest { healthRoutes() }
 
-        AuthState.updateDeviceCode("device-code-123")
+        AuthState.updateDeviceCode("device-code-123", "https://verify.example?user_code=ABC")
         // expires immediately
         AuthState.updateTokens(accessToken = "acc", refreshToken = "ref", expiresInSeconds = 0)
 
@@ -90,7 +90,7 @@ class HealthRoutesTest {
     fun get_health_ready_ready_up_when_tokens_valid() = testApplication {
         val client = setupTest { healthRoutes() }
 
-        AuthState.updateDeviceCode("device-code-123")
+        AuthState.updateDeviceCode("device-code-123", "https://verify.example?user_code=ABC")
         AuthState.updateTokens(accessToken = "acc", refreshToken = "ref", expiresInSeconds = 3600)
 
         val response = client.get("/health/ready")

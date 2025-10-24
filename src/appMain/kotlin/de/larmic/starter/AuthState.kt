@@ -24,6 +24,8 @@ object AuthState {
         private set
     var deviceCode: String? = null
         private set
+    var verificationUrl: String? = null
+        private set
 
     @OptIn(ExperimentalForeignApi::class)
     fun updateTokens(accessToken: String, refreshToken: String?, expiresInSeconds: Int?) {
@@ -34,9 +36,11 @@ object AuthState {
         println("Stored OAuth tokens in memory (issuedAt=${time(null) * 1000L}).")
     }
 
-    fun updateDeviceCode(deviceCode: String) {
+    fun updateDeviceCode(deviceCode: String, verificationUrl: String) {
         AuthState.deviceCode = deviceCode
+        AuthState.verificationUrl = verificationUrl
         println("Stored device_code in memory for later token exchange.")
+        println("Stored verification URL for later use: $verificationUrl")
     }
 
     /**
@@ -72,5 +76,6 @@ object AuthState {
         expiresInSeconds = null
         issuedAdMillis = null
         deviceCode = null
+        verificationUrl = null
     }
 }

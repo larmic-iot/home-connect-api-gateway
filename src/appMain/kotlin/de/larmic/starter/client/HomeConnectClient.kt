@@ -80,19 +80,20 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
             }
 
             val payload: DeviceAuthorizationResponse = response.body()
+            val verificationUrl = "${payload.verificationUri}?user_code=${payload.userCode}"
 
             // Log formatted output similar to example-requests.http
             println("═══════════════════════════════════════════")
             println("Open this URL:")
             println("(This initial step is only needed to authorize this app with Home Connect. Once authorized, a refresh token will be used automatically.)")
-            println("${payload.verificationUri}?user_code=${payload.userCode}")
+            println(verificationUrl)
             println("═══════════════════════════════════════════")
             if (payload.expiresIn != null) println("You have ${payload.expiresIn} seconds")
             val wait = payload.interval ?: 5
             println("")
             println("After entering the code, execute Step 2 (wait $wait seconds)")
 
-            AuthState.updateDeviceCode(payload.deviceCode)
+            AuthState.updateDeviceCode(payload.deviceCode, verificationUrl)
             return payload
         } finally {
             client.close()
