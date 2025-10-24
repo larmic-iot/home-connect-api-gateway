@@ -5,7 +5,6 @@ import de.larmic.starter.client.HomeConnectClient
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.receiveText
 import io.ktor.server.request.queryString
@@ -17,6 +16,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.delete
+import kotlin.io.println
 
 fun Route.proxyRoutes() {
     route("/proxy/{path...}") {
