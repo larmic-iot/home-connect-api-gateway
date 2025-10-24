@@ -16,6 +16,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.delete
+import io.ktor.server.routing.post
 import kotlin.io.println
 
 fun Route.proxyRoutes() {
@@ -29,28 +30,30 @@ fun Route.proxyRoutes() {
         delete {
             call.handleProxy(HttpMethod.Delete)
         }
+        post {
+            call.handleProxy(HttpMethod.Post)
+        }
     }
 }
 
 private suspend fun ApplicationCall.handleProxy(method: HttpMethod) {
     val authStatus = AuthState.status()
-    if (authStatus != AuthState.Status.UP) {
+
+    val statusName = when (authStatus) {
+        is AuthState.Status.StartingDeviceAuthorization -> "StartingDeviceAuthorization"
+        is AuthState.Status.WaitingForManualTasks -> "WaitingForManualTasks"
+        is AuthState.Status.Up -> "Up"
+        is AuthState.Status.TokenExpired -> "TokenExpired"
+    }
+
+    if (authStatus !is AuthState.Status.Up) {
         this.respond(
             HttpStatusCode.ServiceUnavailable,
             mapOf(
                 "status" to "ERROR",
-                "message" to "Application is not ready: ${authStatus.name}",
+                "message" to "Application is not ready: $statusName",
                 "hint" to "Initialize OAuth flow until health/ready shows UP"
             )
-        )
-        return
-    }
-
-    val accessToken = AuthState.accessToken
-    if (accessToken.isNullOrBlank()) {
-        this.respond(
-            HttpStatusCode.ServiceUnavailable,
-            mapOf("status" to "ERROR", "message" to "Missing access token")
         )
         return
     }
@@ -62,11 +65,11 @@ private suspend fun ApplicationCall.handleProxy(method: HttpMethod) {
     val client = HomeConnectClient()
 
     val bodyText = when (method) {
-        HttpMethod.Put, HttpMethod.Delete -> this.receiveText()
+        HttpMethod.Put, HttpMethod.Post -> this.receiveText()
         else -> null
     }
     val reqContentType: ContentType? = when (method) {
-        HttpMethod.Put, HttpMethod.Delete -> this.request.contentType()
+        HttpMethod.Put, HttpMethod.Post -> this.request.contentType()
         else -> null
     }
 
@@ -74,7 +77,7 @@ private suspend fun ApplicationCall.handleProxy(method: HttpMethod) {
         val proxied = client.proxy(
             method = method,
             pathAndQuery = pathAndQuery,
-            accessToken = accessToken,
+            accessToken = authStatus.accessToken,
             bodyText = bodyText?.takeIf { it.isNotEmpty() },
             contentType = reqContentType
         )

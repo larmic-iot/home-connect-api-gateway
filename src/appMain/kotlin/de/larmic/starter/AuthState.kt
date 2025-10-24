@@ -7,11 +7,11 @@ import platform.posix.time
  * In-memory holder for OAuth tokens. Ephemeral; will be lost on application restart.
  */
 object AuthState {
-    enum class Status {
-        STARTING_DEVICE_AUTHORIZATION,
-        WAITING_FOR_MANUAL_TASKS,
-        UP,
-        TOKEN_EXPIRED
+    sealed class Status {
+        data object StartingDeviceAuthorization : Status()
+        data class WaitingForManualTasks(val deviceCode: String) : Status()
+        data class Up(val accessToken: String, val refreshToken: String) : Status()
+        data class TokenExpired(val refreshToken: String) : Status()
     }
 
     var accessToken: String? = null
@@ -45,10 +45,10 @@ object AuthState {
     @OptIn(ExperimentalForeignApi::class)
     fun status(): Status {
         // 1) No device code yet -> starting device authorization
-        if (deviceCode.isNullOrBlank()) return Status.STARTING_DEVICE_AUTHORIZATION
+        if (deviceCode.isNullOrBlank()) return Status.StartingDeviceAuthorization
 
         // 2) Device code exists but tokens not set yet -> waiting for manual tasks
-        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) return Status.WAITING_FOR_MANUAL_TASKS
+        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) return Status.WaitingForManualTasks(deviceCode!!)
 
         // 3) Tokens exist; check expiry if we have metadata
         val issuedAt = issuedAdMillis
@@ -56,11 +56,11 @@ object AuthState {
         if (issuedAt != null && expires != null) {
             val now = time(null) * 1000L
             val expiresAt = issuedAt + expires.toLong() * 1000L
-            if (now >= expiresAt) return Status.TOKEN_EXPIRED
+            if (now >= expiresAt) return Status.TokenExpired(refreshToken!!)
         }
 
-        // 4) Otherwise we are up
-        return Status.UP
+        // 4) Otherwise we are up - return with guaranteed tokens
+        return Status.Up(accessToken!!, refreshToken!!)
     }
 
     /**

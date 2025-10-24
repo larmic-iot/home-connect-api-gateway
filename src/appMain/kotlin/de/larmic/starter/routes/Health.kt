@@ -8,18 +8,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HealthResponse(
-    val status: String
+    val status: String,
 )
 
 @Serializable
 data class ReadinessCheckDetail(
-    val authorization: String
+    val authorization: String,
 )
 
 @Serializable
 data class ReadinessResponse(
     val status: String,
-    val checks: ReadinessCheckDetail
+    val checks: ReadinessCheckDetail,
 )
 
 fun Route.healthRoutes() {
@@ -29,16 +29,24 @@ fun Route.healthRoutes() {
 
     get("/health/ready") {
         val authStatus = AuthState.status()
-        val isReady = authStatus == AuthState.Status.UP
-        val httpStatus = if (isReady) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
-        val overall = if (isReady) "READY" else "NOT_READY"
+
+        val statusName = when (authStatus) {
+            is AuthState.Status.StartingDeviceAuthorization -> "STARTING_DEVICE_AUTHORIZATION"
+            is AuthState.Status.WaitingForManualTasks -> "WAITING_FOR_MANUAL_TASKS"
+            is AuthState.Status.Up -> "UP"
+            is AuthState.Status.TokenExpired -> "TOKEN_EXPIRED"
+        }
+
+        val ready = authStatus is AuthState.Status.Up
+        val httpStatus = if (ready) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
+        val overall = if (ready) "READY" else "NOT_READY"
 
         call.respond(
             httpStatus,
             ReadinessResponse(
                 status = overall,
                 checks = ReadinessCheckDetail(
-                    authorization = authStatus.name
+                    authorization = statusName
                 )
             )
         )
