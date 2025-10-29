@@ -21,6 +21,7 @@ WORKDIR /src
 # Cache-friendly copy
 COPY gradle/wrapper/ gradle/wrapper/
 COPY gradlew gradlew
+COPY gradle.properties gradle.properties
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 RUN chmod +x gradlew
