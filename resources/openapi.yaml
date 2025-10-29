@@ -14,10 +14,23 @@ servers:
 externalDocs:
   description: Home Connect API specification
   url: https://apiclient.home-connect.com/
+
+# Tags used to group operations in the UI
+tags:
+  - name: Documentation
+    description: Endpoints for serving documentation and the OpenAPI description
+  - name: Health
+    description: Liveness and readiness endpoints of the gateway
+  - name: OAuth
+    description: OAuth Device Code Flow helper endpoints
+  - name: Proxy
+    description: Reverse proxy endpoints forwarding to the Home Connect API
+
 paths:
   /openapi.yaml:
     get:
       summary: Returns this OpenAPI YAML
+      tags: [Documentation]
       operationId: getOpenApiYaml
       responses:
         '200':
@@ -31,6 +44,7 @@ paths:
   /health:
     get:
       summary: Liveness check
+      tags: [Health]
       operationId: getHealth
       responses:
         '200':
@@ -46,6 +60,7 @@ paths:
   /health/live:
     get:
       summary: Liveness check (alias)
+      tags: [Health]
       operationId: getHealthLive
       responses:
         '200':
@@ -61,6 +76,7 @@ paths:
   /health/ready:
     get:
       summary: Readiness check including OAuth status
+      tags: [Health]
       operationId: getHealthReady
       responses:
         '200':
@@ -101,6 +117,7 @@ paths:
   /oauth/init:
     get:
       summary: Starts the OAuth Device Code Flow (user code + verification URI)
+      tags: [OAuth]
       operationId: oauthInit
       responses:
         '200':
@@ -118,6 +135,7 @@ paths:
   /oauth/token:
     get:
       summary: Requests a new access token using an existing refresh token
+      tags: [OAuth]
       operationId: oauthToken
       responses:
         '200':
@@ -141,6 +159,7 @@ paths:
   /oauth/token/refresh:
     get:
       summary: Requests a new access token using existing credentials
+      tags: [OAuth]
       operationId: oauthTokenRefresh
       responses:
         '200':
@@ -164,6 +183,7 @@ paths:
   /proxy/{path}:
     get:
       summary: Proxies GET requests to the Home Connect API
+      tags: [Proxy]
       operationId: proxyGet
       parameters:
         - $ref: '#/components/parameters/ProxyPath'
@@ -184,6 +204,7 @@ paths:
                 $ref: '#/components/schemas/ProxyErrorResponse'
     post:
       summary: Proxies POST requests to the Home Connect API
+      tags: [Proxy]
       operationId: proxyPost
       parameters:
         - $ref: '#/components/parameters/ProxyPath'
@@ -210,6 +231,7 @@ paths:
                 $ref: '#/components/schemas/ProxyErrorResponse'
     put:
       summary: Proxies PUT requests to the Home Connect API
+      tags: [Proxy]
       operationId: proxyPut
       parameters:
         - $ref: '#/components/parameters/ProxyPath'
@@ -236,6 +258,7 @@ paths:
                 $ref: '#/components/schemas/ProxyErrorResponse'
     delete:
       summary: Proxies DELETE requests to the Home Connect API
+      tags: [Proxy]
       operationId: proxyDelete
       parameters:
         - $ref: '#/components/parameters/ProxyPath'
