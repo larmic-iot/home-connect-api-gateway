@@ -82,9 +82,9 @@ buildkonfig {
         // Read OpenAPI file and escape for Kotlin triple-quoted string and templates
         val raw = file("resources/openapi.yaml").readText()
         val escaped = raw
-            .replace("\\", "\\\\")
+            //.replace("\\", "\\\\")
             //.replace("$", "\${'$'}")
-            .replace("\"\"\"", "\\\"\\\"\\\"")
+            //.replace("\"\"\"", "\\\"\\\"\\\"")
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "OPENAPI_YAML",
