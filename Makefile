@@ -43,7 +43,7 @@ run-local:
 
 docker-run: ## Runs docker container and tails logs (exposes 8080)
 	@echo "Run docker container"
-	docker run -d -p 8080:8080 --rm --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
+	docker run -d -p --env-file .env 8080:8080 --rm --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
 	docker logs -f ${CONTAINER_NAME}
 
 docker-stop: ## Stops running docker container
