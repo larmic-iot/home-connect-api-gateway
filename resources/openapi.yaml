@@ -161,7 +161,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /api/{path}:
+  /proxy/{path}:
     get:
       summary: Proxies GET requests to the Home Connect API
       operationId: proxyGet
@@ -254,6 +254,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProxyErrorResponse'
+
 components:
   parameters:
     ProxyPath:
