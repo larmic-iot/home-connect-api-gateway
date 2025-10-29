@@ -7,6 +7,7 @@
 # See: https://youtrack.jetbrains.com/issue/KT-36871
 FROM --platform=linux/amd64 eclipse-temurin:24-jdk AS build
 ARG TARGETARCH
+ARG GIT_VERSION=dev
 
 # Install native toolchain for Kotlin/Native Linux builds
 RUN apt-get update \
@@ -29,12 +30,13 @@ RUN ./gradlew --no-daemon --version
 
 # Copy the rest of the sources
 COPY src/ src/
+COPY resources/ resources/
 
 # Build release executable for current platform
 RUN set -eux; \
     case "$TARGETARCH" in \
-        amd64) ./gradlew --no-daemon linkReleaseExecutableApp -PtargetOs="Linux" -PtargetArch="x86_64" ;; \
-        arm64) ./gradlew --no-daemon linkReleaseExecutableApp -PtargetOs="Linux" -PtargetArch="aarch64" ;; \
+        amd64) ./gradlew --no-daemon linkReleaseExecutableApp -PtargetOs="Linux" -PtargetArch="x86_64" -PgitVersion="$GIT_VERSION" ;; \
+        arm64) ./gradlew --no-daemon linkReleaseExecutableApp -PtargetOs="Linux" -PtargetArch="aarch64" -PgitVersion="$GIT_VERSION" ;; \
         *) echo "Unsupported TARGETARCH: $TARGETARCH" && exit 1 ;; \
     esac
 

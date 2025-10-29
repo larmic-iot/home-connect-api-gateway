@@ -7,7 +7,7 @@ info:
     the gateway routes, not the original Home Connect API itself.
 
     Note on the Home Connect API specification: https://apiclient.home-connect.com/
-  version: 1.0.0
+  version: ${GIT_VERSION}
 servers:
   - url: http://localhost:8080
     description: Local development server

@@ -77,11 +77,18 @@ buildkonfig {
     packageName = "de.larmic.starter"
     // Generate constants for all targets using defaultConfigs
     defaultConfigs {
+        // Get git version from Gradle property (default: "dev" for local builds)
+        val gitVersion = project.findProperty("gitVersion") as String? ?: "dev"
+
+        // Read OpenAPI file and replace version placeholder
+        val openapiContent = file("resources/openapi.yaml").readText()
+            .replace("\${GIT_VERSION}", gitVersion)
+
         // Read OpenAPI file and expose as constant
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "OPENAPI_YAML",
-            file("resources/openapi.yaml").readText()
+            openapiContent
         )
 
         // Read Stoplight index.html and expose as constant
