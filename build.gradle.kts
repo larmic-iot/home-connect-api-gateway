@@ -87,11 +87,11 @@ buildkonfig {
             openApiYaml
         )
 
-        // Read OpenAPI index.html and expose as constant
+        // Read Stoplight index.html and expose as constant
         val openApiIndexHtml = file("resources/index.html").readText()
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            "OPENAPI_INDEX_HTML",
+            "INDEX_HTML",
             openApiIndexHtml
         )
     }

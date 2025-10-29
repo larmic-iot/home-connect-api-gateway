@@ -11,7 +11,7 @@ fun Route.stoplightElementsRoute() {
     get("/index.html") {
         call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"index.html\"")
         call.respondText(
-            BuildKonfig.OPENAPI_INDEX_HTML,
+            BuildKonfig.INDEX_HTML,
             contentType = ContentType.Text.Html
         )
     }

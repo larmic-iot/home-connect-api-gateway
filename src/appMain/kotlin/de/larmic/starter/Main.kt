@@ -29,9 +29,9 @@ fun main() {
             deviceAuthorizationRoute()
             oauthTokenRoute()
             tokenRefreshRoute()
-            proxyRoutes()
             openApiRoute()
             stoplightElementsRoute()
+            proxyRoutes()
         }
     }.start(wait = true)
 }
