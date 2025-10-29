@@ -1,0 +1,355 @@
+openapi: 3.0.3
+info:
+  title: Home Connect API Gateway
+  description: |
+    Ein leichtgewichtiges Gateway, das den OAuth Device Code Flow erleichtert und
+    Anfragen an die Home Connect API proxyt. Diese Spezifikation beschreibt die
+    Gateway-Routen, nicht die originale Home Connect API selbst.
+
+    Hinweis zur Home Connect API Spezifikation: https://apiclient.home-connect.com/
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Lokaler Entwicklungsserver
+externalDocs:
+  description: Home Connect API Spezifikation
+  url: https://apiclient.home-connect.com/
+paths:
+  /openapi.yaml:
+    get:
+      summary: Liefert diese OpenAPI YAML
+      operationId: getOpenApiYaml
+      responses:
+        '200':
+          description: OpenAPI YAML
+          content:
+            application/yaml:
+              schema:
+                type: string
+              example: |
+                # OpenAPI YAML Inhalt
+  /health:
+    get:
+      summary: Liveness Check
+      operationId: getHealth
+      responses:
+        '200':
+          description: Server lebt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                default:
+                  value:
+                    status: UP
+  /health/live:
+    get:
+      summary: Liveness Check (Alias)
+      operationId: getHealthLive
+      responses:
+        '200':
+          description: Server lebt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                default:
+                  value:
+                    status: UP
+  /health/ready:
+    get:
+      summary: Readiness Check inkl. OAuth Status
+      operationId: getHealthReady
+      responses:
+        '200':
+          description: Bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+              examples:
+                ready:
+                  summary: Tokens vorhanden
+                  value:
+                    status: READY
+                    checks:
+                      authorization: UP
+        '503':
+          description: Nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+              examples:
+                starting:
+                  value:
+                    status: NOT_READY
+                    checks:
+                      authorization: STARTING_DEVICE_AUTHORIZATION
+                waiting:
+                  value:
+                    status: NOT_READY
+                    checks:
+                      authorization: WAITING_FOR_MANUAL_TASKS
+                expired:
+                  value:
+                    status: NOT_READY
+                    checks:
+                      authorization: TOKEN_EXPIRED
+  /oauth/init:
+    get:
+      summary: Startet den OAuth Device Code Flow (User Code + Verification URI)
+      operationId: oauthInit
+      responses:
+        '200':
+          description: Device Authorization Daten
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAuthorizationResponse'
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /oauth/token:
+    get:
+      summary: Fragt mit einem vorhandenen Refresh Token ein neues Access Token an
+      operationId: oauthToken
+      responses:
+        '200':
+          description: OAuth Token Antwort
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthTokenResponse'
+        '400':
+          description: Fehlerhafte Anfrage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /oauth/token/refresh:
+    get:
+      summary: Fragt ein neues Access Token mit vorhandenen Credentials an
+      operationId: oauthTokenRefresh
+      responses:
+        '200':
+          description: OAuth Token Antwort
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthTokenResponse'
+        '400':
+          description: Fehlerhafte Anfrage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/{path}:
+    get:
+      summary: Proxyt GET Anfragen an die Home Connect API
+      operationId: proxyGet
+      parameters:
+        - $ref: '#/components/parameters/ProxyPath'
+      responses:
+        '200':
+          description: Antwort der Home Connect API
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+        '502':
+          description: Fehler beim Proxy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+    post:
+      summary: Proxyt POST Anfragen an die Home Connect API
+      operationId: proxyPost
+      parameters:
+        - $ref: '#/components/parameters/ProxyPath'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Antwort der Home Connect API
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+        '502':
+          description: Fehler beim Proxy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+    put:
+      summary: Proxyt PUT Anfragen an die Home Connect API
+      operationId: proxyPut
+      parameters:
+        - $ref: '#/components/parameters/ProxyPath'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Antwort der Home Connect API
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+        '502':
+          description: Fehler beim Proxy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+    delete:
+      summary: Proxyt DELETE Anfragen an die Home Connect API
+      operationId: proxyDelete
+      parameters:
+        - $ref: '#/components/parameters/ProxyPath'
+      responses:
+        '200':
+          description: Antwort der Home Connect API
+        '503':
+          description: Gateway nicht bereit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+        '502':
+          description: Fehler beim Proxy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyErrorResponse'
+components:
+  parameters:
+    ProxyPath:
+      name: path
+      in: path
+      required: true
+      description: Pfad relativ zu /api der Home Connect API (z. B. appliances)
+      schema:
+        type: string
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [UP]
+      required: [status]
+    ReadinessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [READY, NOT_READY]
+        checks:
+          type: object
+          properties:
+            authorization:
+              type: string
+              enum:
+                - STARTING_DEVICE_AUTHORIZATION
+                - WAITING_FOR_MANUAL_TASKS
+                - UP
+                - TOKEN_EXPIRED
+          required: [authorization]
+      required: [status, checks]
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        hint:
+          type: string
+      required: [status, message]
+    ProxyErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            homeConnectApiSpec:
+              type: string
+              example: https://apiclient.home-connect.com/
+    DeviceAuthorizationResponse:
+      type: object
+      properties:
+        device_code:
+          type: string
+        user_code:
+          type: string
+        verification_uri:
+          type: string
+        verification_uri_complete:
+          type: string
+          nullable: true
+        expires_in:
+          type: integer
+          nullable: true
+        interval:
+          type: integer
+          nullable: true
+      required: [device_code, user_code, verification_uri]
+    OAuthTokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          nullable: true
+        refresh_token:
+          type: string
+          nullable: true
+        token_type:
+          type: string
+          nullable: true
+        expires_in:
+          type: integer
+          nullable: true
+        scope:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        error_description:
+          type: string
+          nullable: true
+        error_uri:
+          type: string
+          nullable: true

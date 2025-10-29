@@ -1,6 +1,9 @@
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
+
 plugins {
     kotlin("multiplatform") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.20"
+    id("com.codingfeline.buildkonfig") version "0.15.1"
 }
 
 group = "de.larmic.starter"
@@ -69,6 +72,24 @@ kotlin {
                 implementation("io.ktor:ktor-server-test-host:3.3.1")
             }
         }
+    }
+}
+
+buildkonfig {
+    packageName = "de.larmic.starter"
+    // Generate constants for all targets using defaultConfigs
+    defaultConfigs {
+        // Read OpenAPI file and escape for Kotlin triple-quoted string and templates
+        val raw = file("resources/openapi.yaml").readText()
+        val escaped = raw
+            .replace("\\", "\\\\")
+            //.replace("$", "\${'$'}")
+            .replace("\"\"\"", "\\\"\\\"\\\"")
+        buildConfigField(
+            com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            "OPENAPI_YAML",
+            escaped
+        )
     }
 }
 
