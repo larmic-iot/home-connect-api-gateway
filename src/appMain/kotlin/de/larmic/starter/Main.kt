@@ -5,6 +5,7 @@ import de.larmic.starter.routes.healthRoutes
 import de.larmic.starter.routes.oauthTokenRoute
 import de.larmic.starter.routes.tokenRefreshRoute
 import de.larmic.starter.routes.proxyRoutes
+import de.larmic.starter.routes.openApiRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.*
@@ -28,6 +29,7 @@ fun main() {
             oauthTokenRoute()
             tokenRefreshRoute()
             proxyRoutes()
+            openApiRoute()
         }
     }.start(wait = true)
 }

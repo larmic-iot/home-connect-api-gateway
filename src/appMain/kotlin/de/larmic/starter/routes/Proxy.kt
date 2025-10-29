@@ -52,7 +52,8 @@ private suspend fun ApplicationCall.handleProxy(method: HttpMethod) {
             mapOf(
                 "status" to "ERROR",
                 "message" to "Application is not ready: $statusName",
-                "hint" to "Initialize OAuth flow until health/ready shows UP"
+                "hint" to "Initialize OAuth flow until health/ready shows UP",
+                "homeConnectApiSpec" to "https://apiclient.home-connect.com/"
             )
         )
         return
@@ -101,7 +102,8 @@ private suspend fun ApplicationCall.handleProxy(method: HttpMethod) {
             HttpStatusCode.BadGateway,
             mapOf(
                 "status" to "ERROR",
-                "message" to (t.message ?: "Proxy request failed")
+                "message" to (t.message ?: "Proxy request failed"),
+                "homeConnectApiSpec" to "https://apiclient.home-connect.com/"
             )
         )
     }
