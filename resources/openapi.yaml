@@ -126,12 +126,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceAuthorizationResponse'
-        '503':
-          description: Gateway not ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /oauth/token:
     get:
       summary: Requests a new access token
@@ -146,12 +140,6 @@ paths:
                 $ref: '#/components/schemas/OAuthTokenResponse'
         '400':
           description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Gateway not ready
           content:
             application/json:
               schema:
@@ -174,12 +162,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Gateway not ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /proxy/{path}:
     get:
       summary: Proxies GET requests to the Home Connect API
@@ -190,18 +172,6 @@ paths:
       responses:
         '200':
           description: Response from the Home Connect API
-        '503':
-          description: Gateway not ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
-        '502':
-          description: Proxy error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
     post:
       summary: Proxies POST requests to the Home Connect API
       tags: [Proxy]
@@ -217,18 +187,6 @@ paths:
       responses:
         '200':
           description: Response from the Home Connect API
-        '503':
-          description: Gateway not ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
-        '502':
-          description: Proxy error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
     put:
       summary: Proxies PUT requests to the Home Connect API
       tags: [Proxy]
@@ -244,18 +202,6 @@ paths:
       responses:
         '200':
           description: Response from the Home Connect API
-        '503':
-          description: Gateway not ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
-        '502':
-          description: Proxy error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
     delete:
       summary: Proxies DELETE requests to the Home Connect API
       tags: [Proxy]
@@ -265,18 +211,6 @@ paths:
       responses:
         '200':
           description: Response from the Home Connect API
-        '503':
-          description: Gateway not ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
-        '502':
-          description: Proxy error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProxyErrorResponse'
 
 components:
   parameters:
@@ -323,14 +257,6 @@ components:
         hint:
           type: string
       required: [status, message]
-    ProxyErrorResponse:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - type: object
-          properties:
-            homeConnectApiSpec:
-              type: string
-              example: https://apiclient.home-connect.com/
     DeviceAuthorizationResponse:
       type: object
       properties:
