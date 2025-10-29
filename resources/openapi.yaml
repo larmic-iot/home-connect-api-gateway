@@ -146,7 +146,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /oauth/token/refresh:
     get:
-      summary: Refreshes access token
+      summary: Refreshes existing access token
       tags: [OAuth]
       operationId: oauthTokenRefresh
       responses:
@@ -262,19 +262,22 @@ components:
       properties:
         device_code:
           type: string
+          example: "GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS"
         user_code:
           type: string
+          example: "WDJB-MJHT"
         verification_uri:
           type: string
+          example: "https://api.home-connect.com/security/oauth/device_authorization"
         verification_uri_complete:
           type: string
-          nullable: true
+          example: "https://api.home-connect.com/security/oauth/device_verify?user_code=WDJB-MJHT"
         expires_in:
           type: integer
-          nullable: true
+          example: 1810
         interval:
           type: integer
-          nullable: true
+          example: 5
       required: [device_code, user_code, verification_uri]
     OAuthTokenResponse:
       type: object

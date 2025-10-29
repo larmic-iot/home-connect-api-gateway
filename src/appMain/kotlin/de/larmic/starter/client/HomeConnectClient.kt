@@ -30,9 +30,9 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
      @SerialName("device_code") val deviceCode: String,
      @SerialName("user_code") val userCode: String,
      @SerialName("verification_uri") val verificationUri: String,
-     @SerialName("verification_uri_complete") val verificationUriComplete: String? = null,
-     @SerialName("expires_in") val expiresIn: Int? = null,
-     val interval: Int? = null
+     @SerialName("verification_uri_complete") val verificationUriComplete: String,
+     @SerialName("expires_in") val expiresIn: Int,
+     val interval: Int
  )
 
  @Serializable
