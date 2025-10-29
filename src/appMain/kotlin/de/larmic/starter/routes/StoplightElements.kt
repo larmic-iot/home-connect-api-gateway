@@ -16,6 +16,14 @@ fun Route.stoplightElementsRoute() {
         )
     }
 
+    get("/") {
+        call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"index.html\"")
+        call.respondText(
+            BuildKonfig.STOPLIGHT_INDEX_HTML,
+            contentType = ContentType.Text.Html
+        )
+    }
+
     get("/assets/stoplight-elements/web-components.min.js") {
         call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"web-components.min.js\"")
         call.respondText(

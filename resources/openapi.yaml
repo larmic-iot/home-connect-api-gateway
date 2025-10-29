@@ -134,7 +134,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /oauth/token:
     get:
-      summary: Requests a new access token using an existing refresh token
+      summary: Requests a new access token
       tags: [OAuth]
       operationId: oauthToken
       responses:
@@ -158,7 +158,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /oauth/token/refresh:
     get:
-      summary: Requests a new access token using existing credentials
+      summary: Refreshes access token
       tags: [OAuth]
       operationId: oauthTokenRefresh
       responses:
