@@ -28,12 +28,13 @@ class AuthStateTest {
     @Test
     fun `status is WAITING_FOR_MANUAL_TASKS when deviceCode set but tokens missing`() {
         val url = "https://verify.example?user_code=ABC"
-        AuthState.updateDeviceCode("device-code-123", url)
+        val deviceCode = "device-code-123"
+        AuthState.updateDeviceCode(deviceCode, url)
 
         val status = AuthState.status()
         assertTrue(status is AuthState.Status.WaitingForManualTasks)
-        assertEquals("device-code-123", status.deviceCode)
-        assertEquals(url, AuthState.verificationUrl)
+        assertEquals(deviceCode, status.deviceCode)
+        assertEquals(url, status.verificationUrl)
     }
 
     @Test

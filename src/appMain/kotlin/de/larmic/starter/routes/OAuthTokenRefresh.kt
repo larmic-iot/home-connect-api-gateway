@@ -12,7 +12,14 @@ import io.ktor.server.routing.get
 fun Route.tokenRefreshRoute() {
     get("/oauth/token/refresh") {
         val clientId = AppConfig.clientId
-        val refreshToken = AuthState.refreshToken
+        val authStatus = AuthState.status()
+
+        val refreshToken = when (authStatus) {
+            is AuthState.Status.Up -> authStatus.refreshToken
+            is AuthState.Status.TokenExpired -> authStatus.refreshToken
+            is AuthState.Status.StartingDeviceAuthorization,
+            is AuthState.Status.WaitingForManualTasks -> null
+        }
 
         if (refreshToken.isNullOrBlank()) {
             call.respond(

@@ -9,23 +9,17 @@ import platform.posix.time
 object AuthState {
     sealed class Status {
         data object StartingDeviceAuthorization : Status()
-        data class WaitingForManualTasks(val deviceCode: String) : Status()
+        data class WaitingForManualTasks(val deviceCode: String, val verificationUrl: String) : Status()
         data class Up(val accessToken: String, val refreshToken: String) : Status()
         data class TokenExpired(val refreshToken: String) : Status()
     }
 
-    var accessToken: String? = null
-        private set
-    var refreshToken: String? = null
-        private set
-    var expiresInSeconds: Int? = null
-        private set
-    var issuedAdMillis: Long? = null
-        private set
-    var deviceCode: String? = null
-        private set
-    var verificationUrl: String? = null
-        private set
+    private var accessToken: String? = null
+    private var refreshToken: String? = null
+    private var expiresInSeconds: Int? = null
+    private var issuedAdMillis: Long? = null
+    private var deviceCode: String? = null
+    private var verificationUrl: String? = null
 
     @OptIn(ExperimentalForeignApi::class)
     fun updateTokens(accessToken: String, refreshToken: String?, expiresInSeconds: Int?) {
@@ -49,10 +43,12 @@ object AuthState {
     @OptIn(ExperimentalForeignApi::class)
     fun status(): Status {
         // 1) No device code yet -> starting device authorization
-        if (deviceCode.isNullOrBlank()) return Status.StartingDeviceAuthorization
+        if (deviceCode.isNullOrBlank() || verificationUrl.isNullOrBlank())
+            return Status.StartingDeviceAuthorization
 
         // 2) Device code exists but tokens not set yet -> waiting for manual tasks
-        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) return Status.WaitingForManualTasks(deviceCode!!)
+        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank())
+            return Status.WaitingForManualTasks(deviceCode!!, verificationUrl!!)
 
         // 3) Tokens exist; check expiry if we have metadata
         val issuedAt = issuedAdMillis

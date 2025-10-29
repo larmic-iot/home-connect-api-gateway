@@ -13,8 +13,23 @@ fun Route.oauthTokenRoute() {
     get("/oauth/token") {
         val clientId = AppConfig.clientId
 
-        // Prefer stored device_code from the last authorization start
-        val deviceCode = AuthState.deviceCode
+        val authStatus = AuthState.status()
+
+        val deviceCode = when (authStatus) {
+            is AuthState.Status.WaitingForManualTasks -> authStatus.deviceCode
+            is AuthState.Status.Up -> {
+                // Already authenticated - no need to fetch token again
+                call.respond(
+                    HttpStatusCode.OK,
+                    mapOf(
+                        "status" to "ALREADY_AUTHENTICATED",
+                        "message" to "OAuth tokens are already available."
+                    )
+                )
+                return@get
+            }
+            else -> null
+        }
 
         if (deviceCode.isNullOrBlank()) {
             call.respond(
@@ -35,7 +50,17 @@ fun Route.oauthTokenRoute() {
             when {
                 payload.error == "authorization_pending" -> call.respond(HttpStatusCode.Accepted, payload)
                 payload.error != null -> call.respond(HttpStatusCode.BadRequest, payload)
-                else -> call.respond(HttpStatusCode.OK, payload)
+                else -> {
+                    // Store the tokens in AuthState
+                    if (payload.accessToken != null && payload.refreshToken != null) {
+                        AuthState.updateTokens(
+                            accessToken = payload.accessToken,
+                            refreshToken = payload.refreshToken,
+                            expiresInSeconds = payload.expiresInToken
+                        )
+                    }
+                    call.respond(HttpStatusCode.OK, payload)
+                }
             }
         } catch (t: Throwable) {
             println("Token exchange failed: ${t.message}")
