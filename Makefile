@@ -5,7 +5,7 @@ CONTAINER_NAME ?= home-connect-api-gateway
 IMAGE_NAME ?= larmic/home-connect-api-gateway
 IMAGE_TAG ?= latest
 
-.PHONY: help build-binary docker-build-arm docker-build-amd gradle-run docker-run docker-stop
+.PHONY: help build-binary docker-build-arm docker-build-amd gradle-run run-local docker-run docker-stop
 
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
@@ -31,8 +31,15 @@ docker-build-amd: ## Builds AMD64 docker image (linux/amd64)
 	-docker image prune -f
 
 ## —— Run application 🏃🏽————————————————————————————————————————————————————————————————————————————————————————
+# Include .env file if it exists (for local development)
+-include .env
+export
+
 gradle-run: ## Runs app without any container
 	./gradlew runDebug
+
+run-local:
+	./build/bin/app/releaseExecutable/app.kexe
 
 docker-run: ## Runs docker container and tails logs (exposes 8080)
 	@echo "Run docker container"
