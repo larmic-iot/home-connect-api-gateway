@@ -1,5 +1,3 @@
-import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
-
 plugins {
     kotlin("multiplatform") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.20"
@@ -80,19 +78,27 @@ buildkonfig {
     // Generate constants for all targets using defaultConfigs
     defaultConfigs {
         // Read OpenAPI file and expose as constant
-        val openApiYaml = file("resources/openapi.yaml").readText()
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "OPENAPI_YAML",
-            openApiYaml
+            file("resources/openapi.yaml").readText()
         )
 
         // Read Stoplight index.html and expose as constant
-        val openApiIndexHtml = file("resources/index.html").readText()
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
-            "INDEX_HTML",
-            openApiIndexHtml
+            "STOPLIGHT_INDEX_HTML",
+            file("resources/index.html").readText()
+        )
+        buildConfigField(
+            com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            "STOPLIGHT_JS",
+            file("resources/assets/stoplight-elements/web-components.min.js").readText()
+        )
+        buildConfigField(
+            com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            "STOPLIGHT_CSS",
+            file("resources/assets/stoplight-elements/styles.min.css").readText()
         )
     }
 }

@@ -1,19 +1,20 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Elements in HTML</title>
-  
-    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
-  </head>
-  <body>
-
-    <elements-api
-      apiDescriptionUrl="openapi.yaml"
-      router="hash"
-    />
-
-  </body>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Home Connect API Gateway</title>
+    <link rel="stylesheet" href="assets/stoplight-elements/styles.min.css" />
+    <link rel="shortcut icon" href="data:image/png;base64,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" />
+</head>
+<body>
+<elements-api
+        apiDescriptionUrl="openapi.yaml"
+        router="hash"
+        layout="responsive"
+        logo="neusta_logo.png"
+        hideSchemas="true"
+/>
+<script src="assets/stoplight-elements/web-components.min.js"></script>
+</body>
 </html>

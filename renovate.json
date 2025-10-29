@@ -15,6 +15,14 @@
   "prHourlyLimit": 0,
   "timezone": "Europe/Berlin",
   "enabled": true,
+  "regexManagers": [
+    {
+      "fileMatch": ["^Makefile$"] ,
+      "matchStrings": ["STOPLIGHT_VERSION\\s*:?=\\s*(?<currentValue>\\S+)"] ,
+      "depNameTemplate": "@stoplight/elements",
+      "datasourceTemplate": "npm"
+    }
+  ],
   "packageRules": [
     {
       "description": "Automerge safe updates for Gradle and GitHub Actions",

@@ -11,8 +11,24 @@ fun Route.stoplightElementsRoute() {
     get("/index.html") {
         call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"index.html\"")
         call.respondText(
-            BuildKonfig.INDEX_HTML,
+            BuildKonfig.STOPLIGHT_INDEX_HTML,
             contentType = ContentType.Text.Html
+        )
+    }
+
+    get("/assets/stoplight-elements/web-components.min.js") {
+        call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"web-components.min.js\"")
+        call.respondText(
+            BuildKonfig.STOPLIGHT_JS,
+            contentType = ContentType.Text.JavaScript
+        )
+    }
+
+    get("/assets/stoplight-elements/styles.min.css") {
+        call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"styles.min.css\"")
+        call.respondText(
+            BuildKonfig.STOPLIGHT_CSS,
+            contentType = ContentType.Text.CSS
         )
     }
 }

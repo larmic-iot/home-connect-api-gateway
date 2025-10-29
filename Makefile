@@ -5,10 +5,23 @@ CONTAINER_NAME ?= home-connect-api-gateway
 IMAGE_NAME ?= larmic/home-connect-api-gateway
 IMAGE_TAG ?= latest
 
-.PHONY: help build-binary docker-build-arm docker-build-amd gradle-run run-local docker-run docker-stop
+.PHONY: help update-assets build-binary docker-build-arm docker-build-amd gradle-run run-local docker-run docker-stop
 
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
+
+## —— Assets 🏗️——————————————————————————————————————————————————————————————————————————————————————————————————
+# TODO After renovate update this task must be run manually
+STOPLIGHT_VERSION := 9.0.6
+ASSETS_DIR := resources/assets
+
+update-stoplight-assets:
+	@echo "🔄 Update frontend assets..."
+	@mkdir -p $(ASSETS_DIR)/stoplight-elements
+	@echo "📦 Loading Stoplight Elements v$(STOPLIGHT_VERSION)..."
+	@curl -L --fail -o "$(ASSETS_DIR)/stoplight-elements/styles.min.css" "https://unpkg.com/@stoplight/elements@$(STOPLIGHT_VERSION)/styles.min.css"
+	@curl -L --fail -o "$(ASSETS_DIR)/stoplight-elements/web-components.min.js" "https://unpkg.com/@stoplight/elements@$(STOPLIGHT_VERSION)/web-components.min.js"
+	@echo "✅ Update assets successful!"
 
 ## —— Build 🏗️———————————————————————————————————————————————————————————————————————————————————————————————————
 build-binary: ## Builds binary (executable) in ./build/bin/app/releaseExecutable/app.(k)exe (uses architecture of local machine)
