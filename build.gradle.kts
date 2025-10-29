@@ -79,16 +79,20 @@ buildkonfig {
     packageName = "de.larmic.starter"
     // Generate constants for all targets using defaultConfigs
     defaultConfigs {
-        // Read OpenAPI file and escape for Kotlin triple-quoted string and templates
-        val raw = file("resources/openapi.yaml").readText()
-        val escaped = raw
-            //.replace("\\", "\\\\")
-            //.replace("$", "\${'$'}")
-            //.replace("\"\"\"", "\\\"\\\"\\\"")
+        // Read OpenAPI file and expose as constant
+        val openApiYaml = file("resources/openapi.yaml").readText()
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "OPENAPI_YAML",
-            escaped
+            openApiYaml
+        )
+
+        // Read OpenAPI index.html and expose as constant
+        val openApiIndexHtml = file("resources/index.html").readText()
+        buildConfigField(
+            com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            "OPENAPI_INDEX_HTML",
+            openApiIndexHtml
         )
     }
 }

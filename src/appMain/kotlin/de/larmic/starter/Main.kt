@@ -6,6 +6,7 @@ import de.larmic.starter.routes.oauthTokenRoute
 import de.larmic.starter.routes.tokenRefreshRoute
 import de.larmic.starter.routes.proxyRoutes
 import de.larmic.starter.routes.openApiRoute
+import de.larmic.starter.routes.stoplightElementsRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.install
 import io.ktor.server.cio.*
@@ -30,6 +31,7 @@ fun main() {
             tokenRefreshRoute()
             proxyRoutes()
             openApiRoute()
+            stoplightElementsRoute()
         }
     }.start(wait = true)
 }

@@ -7,12 +7,12 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
-fun Route.openApiRoute() {
-    get("/openapi.yaml") {
-        call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"openapi.yaml\"")
+fun Route.stoplightElementsRoute() {
+    get("/index.html") {
+        call.response.headers.append(HttpHeaders.ContentDisposition, "inline; filename=\"index.html\"")
         call.respondText(
-            BuildKonfig.OPENAPI_YAML,
-            contentType = ContentType.Text.Plain
+            BuildKonfig.OPENAPI_INDEX_HTML,
+            contentType = ContentType.Text.Html
         )
     }
 }
