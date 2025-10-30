@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - '**'
+    paths:
+      - 'src/**'
+      - 'resources/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradle/**'
+      - '.github/workflows/gradle-build.yml'
 
 # Cancel previous runs on the same ref (branch) when a new commit is pushed
 concurrency:
