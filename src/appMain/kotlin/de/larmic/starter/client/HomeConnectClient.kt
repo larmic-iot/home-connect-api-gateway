@@ -22,6 +22,9 @@ import kotlin.io.println
  * Ktor HTTP client using Curl engine to be platform-agnostic (works in Docker/Linux and macOS).
  */
 private fun httpClient(): HttpClient = HttpClient(Curl) {
+    engine {
+        sslVerify = false
+    }
     install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
 }
 
