@@ -15,6 +15,7 @@
   "prHourlyLimit": 0,
   "timezone": "Europe/Berlin",
   "enabled": true,
+  "allowedPostUpgradeCommands": ["^make update-stoplight-assets$"] ,
   "regexManagers": [
     {
       "fileMatch": ["^Makefile$"] ,
@@ -41,6 +42,15 @@
       "description": "Group Kotlin and Gradle ecosystem",
       "matchPackagePatterns": ["^org.jetbrains.kotlin", "^org.gradle"],
       "groupName": "Kotlin & Gradle ecosystem"
+    },
+    {
+      "description": "Update Stoplight assets after version bump",
+      "matchManagers": ["regex"],
+      "matchDepNames": ["@stoplight/elements"],
+      "postUpgradeTasks": {
+        "commands": ["make update-stoplight-assets"],
+        "fileFilters": ["resources/assets/**"]
+      }
     }
   ]
 }
