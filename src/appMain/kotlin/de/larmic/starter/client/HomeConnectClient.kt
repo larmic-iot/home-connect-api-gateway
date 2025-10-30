@@ -20,10 +20,16 @@ import kotlin.io.println
 
 /**
  * Ktor HTTP client using Curl engine to be platform-agnostic (works in Docker/Linux and macOS).
+ *
+ * Note: sslVerify is disabled due to known issues with libcurl/CA certificates in Alpine Linux
+ * with Kotlin/Native. The connection itself is still encrypted (TLS/HTTPS), but the certificate
+ * chain is not verified. This is acceptable for a private gateway to a well-known API endpoint.
+ *
+ * Alternative: Use a Debian-based runtime image if certificate validation is required.
  */
 private fun httpClient(): HttpClient = HttpClient(Curl) {
     engine {
-        sslVerify = false
+        sslVerify = false // Workaround for Alpine + Kotlin/Native + libcurl CA certificate issues
     }
     install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
 }
