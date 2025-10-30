@@ -35,36 +35,35 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
 }
 
 @Serializable
- data class DeviceAuthorizationResponse(
-     @SerialName("device_code") val deviceCode: String,
-     @SerialName("user_code") val userCode: String,
-     @SerialName("verification_uri") val verificationUri: String,
-     @SerialName("verification_uri_complete") val verificationUriComplete: String,
-     @SerialName("expires_in") val expiresIn: Int,
-     val interval: Int
- )
+data class DeviceAuthorizationResponse(
+    @SerialName("device_code") val deviceCode: String,
+    @SerialName("user_code") val userCode: String,
+    @SerialName("verification_uri") val verificationUri: String,
+    @SerialName("expires_in") val expiresIn: Int,
+    val interval: Int? = 5,
+)
 
- @Serializable
- data class OAuthTokenResponse(
-     @SerialName("access_token") val accessToken: String? = null,
-     @SerialName("refresh_token") val refreshToken: String? = null,
-     @SerialName("token_type") val tokenType: String? = null,
-     @SerialName("expires_in") val expiresInToken: Int? = null,
-     val scope: String? = null,
-     val error: String? = null,
-     @SerialName("error_description") val errorDescription: String? = null,
-     @SerialName("error_uri") val errorUri: String? = null
- )
- 
- @Serializable
- data class ProxiedResponse(
-     val status: Int,
-     val contentType: String?,
-     val body: ByteArray
- )
- 
- class HomeConnectClient(
-    private val baseUrl: String = "https://api.home-connect.com"
+@Serializable
+data class OAuthTokenResponse(
+    @SerialName("access_token") val accessToken: String? = null,
+    @SerialName("refresh_token") val refreshToken: String? = null,
+    @SerialName("token_type") val tokenType: String? = null,
+    @SerialName("expires_in") val expiresInToken: Int? = null,
+    val scope: String? = null,
+    val error: String? = null,
+    @SerialName("error_description") val errorDescription: String? = null,
+    @SerialName("error_uri") val errorUri: String? = null,
+)
+
+@Serializable
+data class ProxiedResponse(
+    val status: Int,
+    val contentType: String?,
+    val body: ByteArray,
+)
+
+class HomeConnectClient(
+    private val baseUrl: String = "https://api.home-connect.com",
 ) {
     /**
      * Performs the Device Authorization request (OAuth 2.0 Device Code Flow, Step 1).
@@ -73,7 +72,7 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
      */
     suspend fun startDeviceAuthorization(
         clientId: String,
-        scope: String = "IdentifyAppliance Monitor Settings Control"
+        scope: String = "IdentifyAppliance Monitor Settings Control",
     ): DeviceAuthorizationResponse {
         val bodyParams = Parameters.build {
             append("client_id", clientId)
@@ -97,10 +96,9 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
             println("(This initial step is only needed to authorize this app with Home Connect. Once authorized, a refresh token will be used automatically.)")
             println(verificationUrl)
             println("═══════════════════════════════════════════")
-            if (payload.expiresIn != null) println("You have ${payload.expiresIn} seconds")
-            val wait = payload.interval ?: 5
+            println("You have ${payload.expiresIn} seconds")
             println("")
-            println("After entering the code, execute Step 2 (wait $wait seconds)")
+            println("After entering the code, execute Step 2 (wait ${payload.interval ?: 5} seconds)")
 
             AuthState.updateDeviceCode(payload.deviceCode, verificationUrl)
             return payload
@@ -115,7 +113,7 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
      */
     suspend fun getOAuthToken(
         clientId: String,
-        deviceCode: String
+        deviceCode: String,
     ): OAuthTokenResponse {
         val bodyParams = Parameters.build {
             append("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
@@ -137,9 +135,11 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
                 payload.error == "authorization_pending" -> {
                     println("Waiting for authorization... Run this request again!")
                 }
+
                 payload.error != null -> {
                     println("Error: ${payload.error}${payload.errorDescription?.let { ": $it" } ?: ""}")
                 }
+
                 else -> {
                     println("═══════════════════════════════════════════")
                     println("✓ Success!")
@@ -175,7 +175,7 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
      */
     suspend fun refreshToken(
         clientId: String,
-        refreshToken: String
+        refreshToken: String,
     ): OAuthTokenResponse {
         val bodyParams = Parameters.build {
             append("grant_type", "refresh_token")
@@ -225,7 +225,7 @@ private fun httpClient(): HttpClient = HttpClient(Curl) {
         pathAndQuery: String,
         accessToken: String,
         bodyText: String? = null,
-        contentType: ContentType? = null
+        contentType: ContentType? = null,
     ): ProxiedResponse {
         val url = "$baseUrl/api/" + pathAndQuery.trimStart('/')
         val client = httpClient()
