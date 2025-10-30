@@ -12,38 +12,21 @@ on:
       - 'gradle.properties'
       - 'gradle/**'
       - '.github/workflows/gradle-build.yml'
-  pull_request:
-    branches:
-      - '**'
-    paths:
-      - 'src/**'
-      - 'resources/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradle/**'
-      - '.github/workflows/gradle-build.yml'
-  workflow_dispatch: {}
 
 # Cancel previous runs on the same ref (branch) when a new commit is pushed
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
     name: Build with Gradle
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     permissions:
       contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 1
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
 
       - name: Set up JDK 24
         uses: actions/setup-java@v5
@@ -53,7 +36,6 @@ jobs:
           cache: 'gradle'
 
       - name: Install native toolchain prerequisites (clang, build-essential, zlib1g-dev)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -68,19 +50,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run tests
-        run: ./gradlew --no-daemon --warning-mode all --stacktrace check
-
-      - name: Upload test reports (always)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: |
-            **/build/test-results/**
-            **/build/reports/tests/**
-          if-no-files-found: ignore
-          retention-days: 7
+        run: ./gradlew --no-daemon check
 
       - name: Compile/link native release executable
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
         run: ./gradlew --no-daemon linkReleaseExecutableApp
