@@ -80,3 +80,16 @@ grant_type=refresh_token
     client.global.set("accessToken", response.body.access_token);
     client.log("✓ Token refreshed!");
 %}
+
+###
+### Gateway local helper endpoints (run after starting the Docker container)
+# Base URL: http://localhost:8080
+
+### Init device authorization (POST)
+POST http://localhost:8080/oauth/init
+
+### Poll for tokens (POST) — repeat until no authorization_pending
+POST http://localhost:8080/oauth/token
+
+### Refresh tokens (POST)
+POST http://localhost:8080/oauth/token/refresh

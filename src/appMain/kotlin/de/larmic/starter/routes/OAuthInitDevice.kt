@@ -5,10 +5,10 @@ import de.larmic.starter.client.DeviceAuthorizationResponse
 import de.larmic.starter.client.HomeConnectClient
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 
 fun Route.deviceAuthorizationRoute() {
-    get("/oauth/init") {
+    post("/oauth/init") {
         val clientId = AppConfig.clientId
         val scope = "IdentifyAppliance Monitor Settings Control"
 

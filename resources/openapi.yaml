@@ -115,7 +115,7 @@ paths:
                     checks:
                       authorization: TOKEN_EXPIRED
   /oauth/init:
-    get:
+    post:
       summary: Starts the OAuth Device Code Flow (user code + verification URI)
       tags: [OAuth]
       operationId: oauthInit
@@ -127,7 +127,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceAuthorizationResponse'
   /oauth/token:
-    get:
+    post:
       summary: Requests a new access token
       tags: [OAuth]
       operationId: oauthToken
@@ -145,7 +145,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /oauth/token/refresh:
-    get:
+    post:
       summary: Refreshes existing access token
       tags: [OAuth]
       operationId: oauthTokenRefresh

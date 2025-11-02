@@ -7,10 +7,10 @@ import de.larmic.starter.client.OAuthTokenResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 
 fun Route.oauthTokenRoute() {
-    get("/oauth/token") {
+    post("/oauth/token") {
         val (status, body) = buildOAuthTokenResponse()
         call.respond(status, body)
     }

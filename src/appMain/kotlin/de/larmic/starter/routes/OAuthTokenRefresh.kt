@@ -7,10 +7,10 @@ import de.larmic.starter.client.HomeConnectClient
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 
 fun Route.tokenRefreshRoute() {
-    get("/oauth/token/refresh") {
+    post("/oauth/token/refresh") {
         val (status, body) = buildOAuthTokenRefreshResponse()
         call.respond(status, body)
     }
