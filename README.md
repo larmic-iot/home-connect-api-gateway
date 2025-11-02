@@ -10,6 +10,19 @@ Home Connect API Gateway - Docker container providing a REST API adapter for BSH
 
 ---
 
+What is this?
+- A lightweight HTTP proxy/gateway in front of the official BSH Home Connect API.
+- Provides an easy way to use the API without dealing with OAuth yourself.
+- Ideal for home‑automation platforms, scripts, and services that just want a simple REST surface.
+
+Key features
+- Handles OAuth 2.0 Device Authorization (init, polling) and token refresh for you.
+- Proxies requests to the Home Connect API via unified, minimal endpoints.
+- Ships as a single Docker container; no external state required.
+- Comes with an embedded OpenAPI UI at `/` for quick exploration.
+
+---
+
 Quick start (Docker)
 - Prerequisite: Home Connect client ID.
 - Start container:
