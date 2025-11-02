@@ -35,9 +35,9 @@ Quick start (Docker)
 Configuration
 - Required environment variables:
   - `HOME_CONNECT_CLIENT_ID` — your Home Connect client ID (mandatory)
-- Optional environment variables (milliseconds):
-  - `DEVICE_FLOW_INITIAL_POLL_DELAY_MS` — delay before the first token poll; default 100 (ms) if not set. Docker image default: 10000.
-  - `DEVICE_FLOW_POLL_INTERVAL_MS` — interval between subsequent polls; default 10 (ms) if not set. Docker image default: 1000.
+- Optional environment variables (seconds):
+  - `DEVICE_FLOW_INITIAL_POLL_DELAY_SECONDS` — delay before the first token poll; default 10s if not set. Docker image default: 10s.
+  - `DEVICE_FLOW_POLL_INTERVAL_SECONDS` — interval between subsequent polls; default 5s if not set. Docker image default: 5s.
 
 Notes
 - The service requires `HOME_CONNECT_CLIENT_ID` at startup.

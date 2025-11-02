@@ -23,12 +23,14 @@ object AppConfig {
         clientId = value
         println("Loaded HOME_CONNECT_CLIENT_ID from environment.")
 
-        // Startup device flow polling configuration (milliseconds)
-        // Defaults: initial=5000ms (5 seconds), interval=5000ms (5 seconds)
-        // OAuth 2.0 Device Flow requires at least 5 seconds between polls
-        initialPollDelayMs = getenv("DEVICE_FLOW_INITIAL_POLL_DELAY_MS")?.toLongOrNull() ?: 10000L
-        pollIntervalMs = getenv("DEVICE_FLOW_POLL_INTERVAL_MS")?.toLongOrNull() ?: 5000L
-        println("Device flow polling configured: initialPollDelayMs=$initialPollDelayMs, pollIntervalMs=$pollIntervalMs")
+        // Startup device flow polling configuration (seconds)
+        // Defaults: initial=10s, interval=5s
+        // Note: OAuth 2.0 Device Flow commonly uses >= 5 seconds between polls
+        val initialSeconds = getenv("DEVICE_FLOW_INITIAL_POLL_DELAY_SECONDS")?.toLongOrNull() ?: 10L
+        val intervalSeconds = getenv("DEVICE_FLOW_POLL_INTERVAL_SECONDS")?.toLongOrNull() ?: 5L
+        initialPollDelayMs = initialSeconds * 1000L
+        pollIntervalMs = intervalSeconds * 1000L
+        println("Device flow polling configured: initialDelay=${initialSeconds}s, interval=${intervalSeconds}s")
     }
 }
 

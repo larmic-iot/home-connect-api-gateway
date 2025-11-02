@@ -31,7 +31,9 @@ fun main() {
             // Wait initial delay before first token polling
             val initialDelay = AppConfig.initialPollDelayMs
             val interval = AppConfig.pollIntervalMs
-            println("[Startup] Will start polling for token after ${initialDelay}ms, then every ${interval}ms ...")
+            val initialSec = initialDelay / 1000
+            val intervalSec = interval / 1000
+            println("[Startup] Will start polling for token after ${initialSec}s, then every ${intervalSec}s ...")
             delay(initialDelay)
 
             while (true) {

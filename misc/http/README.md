@@ -18,6 +18,6 @@ Quick start
   - Open gateway-local.http and execute the POST /oauth/* steps, then try proxy requests
 
 Notes
-- Polling can be configured via env vars (ms): DEVICE_FLOW_INITIAL_POLL_DELAY_MS and DEVICE_FLOW_POLL_INTERVAL_MS.
+- Polling can be configured via env vars (seconds): DEVICE_FLOW_INITIAL_POLL_DELAY_SECONDS and DEVICE_FLOW_POLL_INTERVAL_SECONDS.
 - The variable {{clientId}} is resolved from http-client.private.env.json and should not be committed.
 - The http-client.private.env.json file is intentionally not provided; use the .example as a template.
