@@ -1,16 +1,19 @@
 # HTTP Client examples
 
-This folder contains JetBrains HTTP Client requests to interact with the Home Connect API.
+This folder contains JetBrains HTTP Client requests for both the original Home Connect API and this gateway.
+
+Files
+- home-connect-api.http — requests to the official Home Connect API (device flow, token, sample GET)
+- gateway-local.http — requests to this gateway (POST /oauth/* and proxy examples)
 
 Quick start
 - Create a private environment file next to this README
   - Copy http-client.private.env.json.example to http-client.private.env.json
   - Put your Home Connect client ID into the file under the "default" environment
-- Open example-requests.http in your IDE and run the requests in order
-  1) Step 1: Request device code
-  2) Step 2: Exchange device code for tokens (may need to retry until authorized)
-  3) Step 3: List home appliances
-- Optional: To refresh the token later, set @savedRefreshToken in the file or store it in your private env and run the refresh request
+- For direct API testing:
+  - Open home-connect-api.http and run the requests in order
+- For gateway testing (after starting Docker container):
+  - Open gateway-local.http and execute the POST /oauth/* steps, then try proxy requests
 
 Notes
 - The variable {{clientId}} is resolved from http-client.private.env.json and should not be committed.

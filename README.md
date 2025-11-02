@@ -30,5 +30,5 @@ Quick start (Docker)
 
 Notes
 - The service requires `HOME_CONNECT_CLIENT_ID` at startup.
-- Example HTTP requests are in `misc/http/example-requests.http`.
+- Example HTTP requests are in `misc/http/` (see `home-connect-api.http` and `gateway-local.http`).
 

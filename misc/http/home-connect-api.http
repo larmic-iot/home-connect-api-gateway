@@ -3,7 +3,7 @@
 
 ###
 
-### Step 1: Request device code
+### Step 1: Request device code (Home Connect API)
 POST https://api.home-connect.com/security/oauth/device_authorization
 Content-Type: application/x-www-form-urlencoded
 
@@ -31,7 +31,7 @@ client_id={{clientId}}
 
 ###
 
-### Step 2: Exchange device code for tokens (retry until authorized)
+### Step 2: Exchange device code for tokens (retry until authorized) — Home Connect API
 POST https://api.home-connect.com/security/oauth/token
 Content-Type: application/x-www-form-urlencoded
 
@@ -57,16 +57,14 @@ grant_type=urn:ietf:params:oauth:grant-type:device_code
     }
 %}
 
-### Step 3: List home appliances
+### Step 3: List home appliances (direct Home Connect API)
 GET https://api.home-connect.com/api/homeappliances
 Authorization: Bearer {{accessToken}}
 Accept: application/vnd.bsh.sdk.v1+json
 
-<> 2025-10-21T093913.200.json
-
 ###
 
-### Refresh token (optional)
+### Refresh token (optional) — Home Connect API
 @savedRefreshToken = INSERT_REFRESH_TOKEN_HERE
 
 POST https://api.home-connect.com/security/oauth/token
@@ -80,16 +78,3 @@ grant_type=refresh_token
     client.global.set("accessToken", response.body.access_token);
     client.log("✓ Token refreshed!");
 %}
-
-###
-### Gateway local helper endpoints (run after starting the Docker container)
-# Base URL: http://localhost:8080
-
-### Init device authorization (POST)
-POST http://localhost:8080/oauth/init
-
-### Poll for tokens (POST) — repeat until no authorization_pending
-POST http://localhost:8080/oauth/token
-
-### Refresh tokens (POST)
-POST http://localhost:8080/oauth/token/refresh

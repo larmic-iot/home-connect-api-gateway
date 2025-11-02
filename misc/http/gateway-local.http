@@ -1,0 +1,27 @@
+### Gateway local helper endpoints
+# Start the Docker container first (see root README quick start)
+# Base URL: http://localhost:8080
+
+### Init device authorization (POST)
+POST http://localhost:8080/oauth/init
+
+### Poll for tokens (POST) — repeat until no authorization_pending
+POST http://localhost:8080/oauth/token
+
+### Refresh tokens (POST)
+POST http://localhost:8080/oauth/token/refresh
+
+###
+### Proxy examples (requires access token to be ready)
+
+# List home appliances via gateway proxy (forwards to Home Connect API)
+GET http://localhost:8080/proxy/api/homeappliances
+Accept: application/json
+
+# Example POST via gateway proxy (replace path/body as needed)
+POST http://localhost:8080/proxy/api/some/resource
+Content-Type: application/json
+
+{
+  "example": true
+}
