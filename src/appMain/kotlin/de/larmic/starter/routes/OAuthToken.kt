@@ -9,6 +9,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
+fun Route.oauthTokenRoute() {
+    get("/oauth/token") {
+        val (status, body) = buildOAuthTokenResponse()
+        call.respond(status, body)
+    }
+}
+
 private suspend fun buildOAuthTokenResponse(): Pair<HttpStatusCode, Any> {
     val clientId = AppConfig.clientId
     val authStatus = AuthState.status()
@@ -52,12 +59,5 @@ private suspend fun buildOAuthTokenResponse(): Pair<HttpStatusCode, Any> {
     } catch (t: Throwable) {
         println("Token exchange failed: ${t.message}")
         HttpStatusCode.InternalServerError to mapOf("status" to "ERROR", "message" to (t.message ?: "Unknown error"))
-    }
-}
-
-fun Route.oauthTokenRoute() {
-    get("/oauth/token") {
-        val (status, body) = buildOAuthTokenResponse()
-        call.respond(status, body)
     }
 }
