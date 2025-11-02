@@ -55,6 +55,9 @@ kotlin {
                 implementation("io.ktor:ktor-server-content-negotiation:3.3.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
 
+                // Coroutines (works on Kotlin/Native)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
                 // Ktor HTTP client (Native)
                 implementation("io.ktor:ktor-client-core:3.3.1")
                 implementation("io.ktor:ktor-client-content-negotiation:3.3.1")

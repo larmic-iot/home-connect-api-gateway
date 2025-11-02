@@ -61,6 +61,11 @@ LABEL org.opencontainers.image.title="home-connect-api-gateway" \
       org.opencontainers.image.source="https://github.com/larmic-iot/home-connect-api-gateway" \
       org.opencontainers.image.licenses="Apache-2.0"
 
+# Default environment configuration (can be overridden at runtime)
+# Delay before the first token poll (ms) and polling interval (ms)
+ENV DEVICE_FLOW_INITIAL_POLL_DELAY_MS=10000 \
+    DEVICE_FLOW_POLL_INTERVAL_MS=5000
+
 # Copy binary
 COPY --from=build /out-app /app
 

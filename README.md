@@ -18,7 +18,11 @@ Quick start (Docker)
   - Windows PowerShell:
     - `docker run -p 8080:8080 -e HOME_CONNECT_CLIENT_ID=$Env:HOME_CONNECT_CLIENT_ID --name home-connect-gw larmic/home-connect-api-gateway:latest`
 - Open OpenAPI UI: http://localhost:8080 (serves docs).
-- Initialize OAuth device flow:
+- Automatic OAuth device flow on startup:
+  - On start, the app calls the Home Connect Device Authorization endpoint and prints the verification URL and user code.
+  - After an initial delay it will poll for the access token periodically until successful.
+  - You can still trigger the steps manually via the HTTP endpoints below if desired.
+- Manual OAuth endpoints (optional):
   1. `POST http://localhost:8080/oauth/init` → get `user_code` and `verification_uri`.
   2. Open the verification URL and enter the code.
   3. Poll tokens: `POST http://localhost:8080/oauth/token` until success (no `authorization_pending`).
@@ -27,6 +31,13 @@ Quick start (Docker)
 - Use proxy:
   - Example: `GET http://localhost:8080/proxy/api/homeappliances`
   - Send your body with POST/PUT via the `/proxy/...` endpoint.
+
+Configuration
+- Required environment variables:
+  - `HOME_CONNECT_CLIENT_ID` — your Home Connect client ID (mandatory)
+- Optional environment variables (milliseconds):
+  - `DEVICE_FLOW_INITIAL_POLL_DELAY_MS` — delay before the first token poll; default 100 (ms) if not set. Docker image default: 10000.
+  - `DEVICE_FLOW_POLL_INTERVAL_MS` — interval between subsequent polls; default 10 (ms) if not set. Docker image default: 1000.
 
 Notes
 - The service requires `HOME_CONNECT_CLIENT_ID` at startup.
