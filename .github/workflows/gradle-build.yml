@@ -1,31 +1,15 @@
+
 name: Gradle build
 
 on:
   push:
-    branches:
-      - '**'
-    paths:
-      - 'src/**'
-      - 'resources/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradle/**'
-      - '.github/workflows/gradle-build.yml'
+    branches: ['**']
+    paths: ['src/**', 'resources/**', 'build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/**', '.github/workflows/gradle-build.yml']
   pull_request:
-    branches:
-      - '**'
-    paths:
-      - 'src/**'
-      - 'resources/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradle/**'
-      - '.github/workflows/gradle-build.yml'
-  workflow_dispatch: {}
+    branches: ['**']
+    paths: ['src/**', 'resources/**', 'build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/**', '.github/workflows/gradle-build.yml']
+  workflow_dispatch:
 
-# Cancel previous runs on the same ref (branch) when a new commit is pushed
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -38,10 +22,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 1
+      - uses: actions/checkout@v5
 
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v3
@@ -52,37 +33,30 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '24'
-          cache: 'gradle'
 
-      - name: Install native toolchain prerequisites (clang, build-essential, zlib1g-dev)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
+      - name: Install native toolchain
+        if: github.ref == 'refs/heads/main'
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             clang build-essential zlib1g-dev
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: false
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x gradlew
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Run tests
-        run: ./gradlew --no-daemon --warning-mode all --stacktrace check
+        run: ./gradlew --no-daemon check
 
-      - name: Upload test reports (always)
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
-          path: |
-            **/build/test-results/**
-            **/build/reports/tests/**
+          name: test-reports-${{ github.run_number }}
+          path: '**/build/{test-results,reports/tests}/**'
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Compile/link native release executable
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
+      - name: Build native release
+        if: github.ref == 'refs/heads/main'
         run: ./gradlew --no-daemon linkReleaseExecutableApp
