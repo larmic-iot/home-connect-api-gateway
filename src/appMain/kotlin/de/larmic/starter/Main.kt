@@ -48,7 +48,7 @@ fun Application.module() {
                             delay(interval)
                         }
                         is AuthState.Status.Up -> {
-                            log.info("[Startup] Already authenticated. No need to poll for token.")
+                            //log.debug("[Startup] Already authenticated. No need to poll for token.")
                             delay(interval)
                         }
                         is AuthState.Status.TokenExpired -> {
