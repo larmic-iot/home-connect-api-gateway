@@ -32,9 +32,8 @@ fun Application.module() {
                 // Wait initial delay before first token polling
                 val initialDelay = AppConfig.initialPollDelayMs
                 val interval = AppConfig.pollIntervalMs
-                val initialSec = initialDelay / 1000
-                val intervalSec = interval / 1000
-                log.info("[Startup] Will start polling for token after ${initialSec}s, then every ${intervalSec}s ...")
+
+                log.info("[Startup] Will start polling for token after ${initialDelay / 1000}s, then every ${interval / 1000}s ...")
                 delay(initialDelay)
 
                 while (isActive) {
@@ -44,18 +43,24 @@ fun Application.module() {
                             val result = client.getOAuthToken(clientId, st.deviceCode)
                             if (result.accessToken != null) {
                                 log.info("[Startup] Token acquired successfully. Startup polling will stop.")
-                                break
                             }
                             // Continue polling
                             delay(interval)
                         }
                         is AuthState.Status.Up -> {
                             log.info("[Startup] Already authenticated. No need to poll for token.")
-                            break
+                            delay(interval)
                         }
                         is AuthState.Status.TokenExpired -> {
                             // We only handle initial acquisition here; token refresh handled via route or later logic
                             log.info("[Startup] Token is marked expired while polling; will keep polling for a fresh token ...")
+                            val refreshResult = client.refreshToken(clientId, st.refreshToken)
+                            if (refreshResult.error != null) {
+                                log.error("[Startup] Refresh failed: ${refreshResult.error}. This might mean the refresh token expired too.")
+                                // Hier könntest du die Device Authorization neu starten
+                            } else {
+                                log.info("[Startup] Access token successfully refreshed.")
+                            }
                             delay(interval)
                         }
                         is AuthState.Status.StartingDeviceAuthorization -> {
