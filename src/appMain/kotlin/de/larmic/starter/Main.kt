@@ -40,6 +40,7 @@ fun Application.module() {
                 while (isActive) {
                     when (val st = AuthState.status()) {
                         is AuthState.Status.WaitingForManualTasks -> {
+                            log.info("[Startup] Acquire token. No need to poll for token.")
                             val result = client.getOAuthToken(clientId, st.deviceCode)
                             if (result.accessToken != null) {
                                 log.info("[Startup] Token acquired successfully. Startup polling will stop.")
